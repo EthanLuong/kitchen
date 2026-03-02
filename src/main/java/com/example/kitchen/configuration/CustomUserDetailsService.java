@@ -2,6 +2,7 @@ package com.example.kitchen.configuration;
 
 import com.example.kitchen.data.User;
 import com.example.kitchen.repository.UserRepository;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
+@NullMarked
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
 
