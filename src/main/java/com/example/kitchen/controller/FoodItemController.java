@@ -4,6 +4,7 @@ import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
 import com.example.kitchen.service.FoodItemService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,13 +54,13 @@ public class FoodItemController {
 
     // POST /items
     @PostMapping
-    public ResponseEntity<FoodItemResponse> create(@RequestBody FoodItemRequest item, Principal principal) {
+    public ResponseEntity<FoodItemResponse> create(@Valid @RequestBody FoodItemRequest item, Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addItem(principal.getName(), item));
     }
 
     // PUT /items/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<FoodItemResponse> update(@PathVariable Long id, @RequestBody FoodItemRequest item, Principal principal) {
+    public ResponseEntity<FoodItemResponse> update(@PathVariable Long id, @Valid @RequestBody FoodItemRequest item, Principal principal) {
         return ResponseEntity.ok(service.updateItem(principal.getName(), id, item));
     }
 

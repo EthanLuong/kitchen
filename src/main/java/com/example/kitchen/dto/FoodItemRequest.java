@@ -1,16 +1,18 @@
 package com.example.kitchen.dto;
 
 import com.example.kitchen.data.FoodItem;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
 public record FoodItemRequest(
-        String name,
+        @NotBlank String name,
         String brand,
-        FoodItem.FoodType foodType,
+        @NotNull FoodItem.FoodType foodType,
         Double quantity,
         FoodItem.Unit unit,
-        FoodItem.Location location,
+        @NotNull FoodItem.Location location,
         LocalDate expirationDate,
         LocalDate purchaseDate,
         LocalDate openedAt,
