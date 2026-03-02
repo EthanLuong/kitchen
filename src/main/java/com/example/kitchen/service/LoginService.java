@@ -1,6 +1,8 @@
 package com.example.kitchen.service;
 
 import com.example.kitchen.data.User;
+import com.example.kitchen.dto.AuthRequest;
+import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -27,25 +29,23 @@ public class LoginService {
         this.jwtService = jwtService;
     }
 
-    public ResponseEntity<AuthResponse> login(User user) {
+    public AuthResponse login(AuthRequest request) {
         Authentication authentication = auth.authenticate(
-                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
-        AuthResponse response = new AuthResponse(
+        return new AuthResponse(
                 jwtService.createJWT(authentication.getName()), "Bearer", 3600);
-
-        return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<?> signup(User user) {
-        User existingUser = repo.findByUsername(user.getUsername());
+    public void signup(AuthRequest request) {
+        User existingUser = repo.findByUsername(request.username());
         if (existingUser != null) {
             throw new UserAlreadyExistsException();
         }
-        user.setPassword(encoder.encode(user.getPassword()));
+        User user = new User();
+        user.setUsername(request.username());
+        user.setPassword(encoder.encode(request.password()));
         repo.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    public record AuthResponse(String accessToken, String tokenType, long expiresIn) {}
 }

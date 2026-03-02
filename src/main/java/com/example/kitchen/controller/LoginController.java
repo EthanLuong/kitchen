@@ -1,7 +1,9 @@
 package com.example.kitchen.controller;
 
-import com.example.kitchen.data.User;
+import com.example.kitchen.dto.AuthRequest;
+import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.service.LoginService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,14 +20,14 @@ public class LoginController {
         this.service = service;
     }
 
-    // Note: changed from PUT to POST — more conventional for login/signup
     @PostMapping("/login")
-    public ResponseEntity<LoginService.AuthResponse> login(@RequestBody User user) {
-        return service.login(user);
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+        return ResponseEntity.ok(service.login(request));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody User user) {
-        return service.signup(user);
+    public ResponseEntity<Void> signUp(@RequestBody AuthRequest request) {
+        service.signup(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

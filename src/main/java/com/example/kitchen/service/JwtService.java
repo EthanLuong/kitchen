@@ -36,11 +36,12 @@ public class JwtService {
     }
 
 
-    public String verifyJWT(String jwt) {
+
+    public String getSubject(HttpServletRequest request) {
         String subject;
         try {
             subject = Jwts.parser().verifyWith(getKey()).build()
-                    .parseSignedClaims(jwt).getPayload().getSubject();
+                    .parseSignedClaims(retrieveJWT(request)).getPayload().getSubject();
             return subject;
         } catch (JwtException e) {
             log.error("JWT verification failed: {}", e.getMessage());
@@ -53,6 +54,6 @@ public class JwtService {
         if (header != null && header.startsWith("Bearer ")) {
             return header.substring(7);
         }
-        return null;
+        throw new JwtException("No token found");
     }
 }
