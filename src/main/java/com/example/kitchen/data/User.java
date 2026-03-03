@@ -1,13 +1,17 @@
 package com.example.kitchen.data;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
 
@@ -15,9 +19,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userid;
 
-
+    @Column(unique = true)
+    @NotBlank
+    @Size(min=3, max=30)
     private String username;
 
+    @NotBlank
     private String password;
 
     private boolean enabled = true;

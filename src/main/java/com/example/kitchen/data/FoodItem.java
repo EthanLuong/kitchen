@@ -1,7 +1,8 @@
 package com.example.kitchen.data;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -9,7 +10,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "food_items")
 public class FoodItem {
 
@@ -20,7 +22,7 @@ public class FoodItem {
     // Owner
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userid", nullable = false)
-    private com.example.kitchen.data.User user;
+    private User user;
 
     // Basic info
     @Column(nullable = false)
