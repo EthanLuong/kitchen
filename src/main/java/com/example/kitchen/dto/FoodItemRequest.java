@@ -1,6 +1,7 @@
 package com.example.kitchen.dto;
 
 import com.example.kitchen.data.FoodItem;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

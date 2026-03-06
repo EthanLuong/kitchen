@@ -16,7 +16,7 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
     // Expiring within N days for a user
     @Query("SELECT f FROM FoodItem f WHERE f.user.username = :username " +
            "AND f.deletedAt IS NULL AND f.consumed = false " +
-           "AND f.expirationDate BETWEEN CURRENT_DATE AND cutoff")
+           "AND f.expirationDate BETWEEN CURRENT_DATE AND :cutoff")
     List<FoodItem> findExpiringSoon(@Param("username") String username,
                                     @Param("cutoff") LocalDate cutoff);
 
