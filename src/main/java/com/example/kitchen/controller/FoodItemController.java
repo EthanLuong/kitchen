@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/items")
@@ -25,55 +26,59 @@ public class FoodItemController {
     // GET /items — all active items for the logged-in user
     @GetMapping
     public ResponseEntity<List<FoodItemResponse>> getAll(Principal principal) {
-        return ResponseEntity.ok(service.getAllItems(principal.getName()));
+        return ResponseEntity.ok(service.getAllItems(userId(principal)));
     }
 
     // GET /items/{id}
     @GetMapping("/{id}")
     public ResponseEntity<FoodItemResponse> getOne(@PathVariable Long id, Principal principal) {
-        return ResponseEntity.ok(service.getItem(principal.getName(), id));
+        return ResponseEntity.ok(service.getItem(userId(principal), id));
     }
 
     // GET /items/expiring?days=7
     @GetMapping("/expiring")
     public ResponseEntity<List<FoodItemResponse>> getExpiring(@RequestParam(defaultValue = "7") int days, Principal principal) {
-        return ResponseEntity.ok(service.getExpiringSoon(principal.getName(), days));
+        return ResponseEntity.ok(service.getExpiringSoon(userId(principal), days));
     }
 
     // GET /items/location/{location}  e.g. FRIDGE, FREEZER, PANTRY
     @GetMapping("/location/{location}")
     public ResponseEntity<List<FoodItemResponse>> getByLocation(@PathVariable FoodItem.Location location, Principal principal) {
-        return ResponseEntity.ok(service.getByLocation(principal.getName(), location));
+        return ResponseEntity.ok(service.getByLocation(userId(principal), location));
     }
 
     // GET /items/type/{type}  e.g. DAIRY, MEAT, PRODUCE
     @GetMapping("/type/{type}")
     public ResponseEntity<List<FoodItemResponse>> getByType(@PathVariable FoodItem.FoodType type, Principal principal) {
-        return ResponseEntity.ok(service.getByFoodType(principal.getName(), type));
+        return ResponseEntity.ok(service.getByFoodType(userId(principal), type));
     }
 
     // POST /items
     @PostMapping
     public ResponseEntity<FoodItemResponse> create(@Valid @RequestBody FoodItemRequest item, Principal principal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.addItem(principal.getName(), item));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.addItem(userId(principal), item));
     }
 
     // PUT /items/{id}
     @PutMapping("/{id}")
     public ResponseEntity<FoodItemResponse> update(@PathVariable Long id, @Valid @RequestBody FoodItemRequest item, Principal principal) {
-        return ResponseEntity.ok(service.updateItem(principal.getName(), id, item));
+        return ResponseEntity.ok(service.updateItem(userId(principal), id, item));
     }
 
     // PATCH /items/{id}/consume
     @PatchMapping("/{id}/consume")
     public ResponseEntity<FoodItemResponse> consume(@PathVariable Long id, Principal principal) {
-        return ResponseEntity.ok(service.markConsumed(principal.getName(), id));
+        return ResponseEntity.ok(service.markConsumed(userId(principal), id));
     }
 
     // DELETE /items/{id}  (soft delete)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id, Principal principal) {
-        service.deleteItem(principal.getName(), id);
+        service.deleteItem(userId(principal), id);
         return ResponseEntity.noContent().build();
+    }
+
+    private static UUID userId(Principal principal) {
+        return UUID.fromString(principal.getName());
     }
 }

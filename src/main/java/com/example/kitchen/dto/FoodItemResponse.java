@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public record FoodItemResponse(
         Long id,
         String name,
-        String brand,
         FoodItem.FoodType foodType,
         Double quantity,
         FoodItem.Unit unit,
@@ -25,7 +24,6 @@ public record FoodItemResponse(
         return new FoodItemResponse(
                 item.getId(),
                 item.getName(),
-                item.getBrand(),
                 item.getFoodType(),
                 item.getQuantity(),
                 item.getUnit(),
