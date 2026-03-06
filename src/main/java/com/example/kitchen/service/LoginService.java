@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class LoginService {
@@ -27,6 +28,7 @@ public class LoginService {
         this.jwtService = jwtService;
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
         Authentication authentication = auth.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username(), request.password()));
@@ -35,6 +37,7 @@ public class LoginService {
                 jwtService.createJWT(authentication.getName()), "Bearer", 3600);
     }
 
+    @Transactional
     public void signup(AuthRequest request) {
         User existingUser = repo.findByUsername(request.username());
         if (existingUser != null) {

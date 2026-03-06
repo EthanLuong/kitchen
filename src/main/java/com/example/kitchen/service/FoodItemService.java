@@ -9,6 +9,7 @@ import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+
+@Transactional(readOnly = true)
 @Slf4j
 @Service
 public class FoodItemService {
@@ -29,7 +32,7 @@ public class FoodItemService {
     }
 
     // ── Create ─────────────────────────────────────────────────
-
+    @Transactional
     public FoodItemResponse addItem(UUID userId, FoodItemRequest request) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -38,6 +41,8 @@ public class FoodItemService {
 
         return FoodItemResponse.from(foodRepo.save(item));
     }
+
+    
 
     // ── Read ───────────────────────────────────────────────────
 
@@ -67,13 +72,14 @@ public class FoodItemService {
     }
 
     // ── Update ─────────────────────────────────────────────────
-
+    @Transactional
     public FoodItemResponse updateItem(UUID userId, Long id, FoodItemRequest request) {
         FoodItem existing = findOwnedItem(userId, id);
         applyRequest(existing, request);
         return FoodItemResponse.from(foodRepo.save(existing));
     }
-
+    
+    @Transactional
     public FoodItemResponse markConsumed(UUID userId, Long id) {
         FoodItem item = findOwnedItem(userId, id);
         item.setConsumed(true);
@@ -81,7 +87,7 @@ public class FoodItemService {
     }
 
     // ── Delete (soft) ──────────────────────────────────────────
-
+    @Transactional
     public void deleteItem(UUID userId, Long id) {
         FoodItem item = findOwnedItem(userId, id);
         item.setDeletedAt(LocalDateTime.now());
