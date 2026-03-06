@@ -7,24 +7,25 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
 
     // All active (non-deleted, non-consumed) items for a user
-    List<FoodItem> findByUserUsernameAndDeletedAtIsNullAndConsumedFalse(String username);
+    List<FoodItem> findByUserUseridAndDeletedAtIsNullAndConsumedFalse(UUID userid);
 
     // Expiring within N days for a user
-    @Query("SELECT f FROM FoodItem f WHERE f.user.username = :username " +
+    @Query("SELECT f FROM FoodItem f WHERE f.user.userid = :userid " +
            "AND f.deletedAt IS NULL AND f.consumed = false " +
            "AND f.expirationDate BETWEEN CURRENT_DATE AND :cutoff")
-    List<FoodItem> findExpiringSoon(@Param("username") String username,
+    List<FoodItem> findExpiringSoon(@Param("userid") UUID userid,
                                     @Param("cutoff") LocalDate cutoff);
 
     // Filter by location
-    List<FoodItem> findByUserUsernameAndLocationAndDeletedAtIsNullAndConsumedFalse(
-            String username, FoodItem.Location location);
+    List<FoodItem> findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(
+            UUID userid, FoodItem.Location location);
 
     // Filter by food type
-    List<FoodItem> findByUserUsernameAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(
-            String username, FoodItem.FoodType foodType);
+    List<FoodItem> findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(
+            UUID userid, FoodItem.FoodType foodType);
 }
