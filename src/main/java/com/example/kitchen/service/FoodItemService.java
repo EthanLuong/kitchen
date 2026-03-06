@@ -6,6 +6,7 @@ import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
 import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 
 @Transactional(readOnly = true)
+@Slf4j
 @Service
 public class FoodItemService {
 
@@ -30,71 +33,73 @@ public class FoodItemService {
 
     // ── Create ─────────────────────────────────────────────────
     @Transactional
-    public FoodItemResponse addItem(String username, FoodItemRequest request) {
-        User user = userRepo.findByUsername(username);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
-        }
+    public FoodItemResponse addItem(UUID userId, FoodItemRequest request) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         FoodItem item = applyRequest(new FoodItem(), request);
         item.setUser(user);
+
         return FoodItemResponse.from(foodRepo.save(item));
     }
 
+    
+
     // ── Read ───────────────────────────────────────────────────
 
-    public List<FoodItemResponse> getAllItems(String username) {
-        return foodRepo.findByUserUsernameAndDeletedAtIsNullAndConsumedFalse(username)
+    public List<FoodItemResponse> getAllItems(UUID userId) {
+        return foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(userId)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
-    public FoodItemResponse getItem(String username, Long id) {
-        return FoodItemResponse.from(findOwnedItem(username, id));
+    public FoodItemResponse getItem(UUID userId, Long id) {
+        return FoodItemResponse.from(findOwnedItem(userId, id));
     }
 
-    public List<FoodItemResponse> getExpiringSoon(String username, int days) {
+    public List<FoodItemResponse> getExpiringSoon(UUID userId, int days) {
         LocalDate cutoff = LocalDate.now().plusDays(days);
-        return foodRepo.findExpiringSoon(username, cutoff)
+        return foodRepo.findExpiringSoon(userId, cutoff)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
-    public List<FoodItemResponse> getByLocation(String username, FoodItem.Location location) {
-        return foodRepo.findByUserUsernameAndLocationAndDeletedAtIsNullAndConsumedFalse(username, location)
+    public List<FoodItemResponse> getByLocation(UUID userId, FoodItem.Location location) {
+        return foodRepo.findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(userId, location)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
-    public List<FoodItemResponse> getByFoodType(String username, FoodItem.FoodType type) {
-        return foodRepo.findByUserUsernameAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(username, type)
+    public List<FoodItemResponse> getByFoodType(UUID userId, FoodItem.FoodType type) {
+        return foodRepo.findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(userId, type)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
     // ── Update ─────────────────────────────────────────────────
     @Transactional
-    public FoodItemResponse updateItem(String username, Long id, FoodItemRequest request) {
-        FoodItem existing = findOwnedItem(username, id);
+    public FoodItemResponse updateItem(UUID userId, Long id, FoodItemRequest request) {
+        FoodItem existing = findOwnedItem(userId, id);
         applyRequest(existing, request);
         return FoodItemResponse.from(foodRepo.save(existing));
     }
+    
     @Transactional
-    public FoodItemResponse markConsumed(String username, Long id) {
-        FoodItem item = findOwnedItem(username, id);
+    public FoodItemResponse markConsumed(UUID userId, Long id) {
+        FoodItem item = findOwnedItem(userId, id);
         item.setConsumed(true);
         return FoodItemResponse.from(foodRepo.save(item));
     }
 
     // ── Delete (soft) ──────────────────────────────────────────
     @Transactional
-    public void deleteItem(String username, Long id) {
-        FoodItem item = findOwnedItem(username, id);
+    public void deleteItem(UUID userId, Long id) {
+        FoodItem item = findOwnedItem(userId, id);
         item.setDeletedAt(LocalDateTime.now());
         foodRepo.save(item);
     }
 
     // ── Helpers ────────────────────────────────────────────────
 
-    private FoodItem findOwnedItem(String username, Long id) {
+    private FoodItem findOwnedItem(UUID userId, Long id) {
         FoodItem item = foodRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
-        if (!item.getUser().getUsername().equals(username)) {
+        if (!item.getUser().getUserid().equals(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
         return item;
@@ -102,7 +107,6 @@ public class FoodItemService {
 
     private FoodItem applyRequest(FoodItem item, FoodItemRequest request) {
         item.setName(request.name());
-        item.setBrand(request.brand());
         item.setFoodType(request.foodType());
         item.setQuantity(request.quantity());
         item.setUnit(request.unit());

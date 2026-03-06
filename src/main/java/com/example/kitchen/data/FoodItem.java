@@ -28,7 +28,6 @@ public class FoodItem {
     @Column(nullable = false)
     private String name;
 
-    private String brand;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
