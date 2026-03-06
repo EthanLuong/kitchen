@@ -1,8 +1,5 @@
 package com.example.kitchen;
 
-import com.example.kitchen.configuration.CustomUserDetailsService;
-import com.example.kitchen.configuration.JwtFilter;
-import com.example.kitchen.controller.LoginController;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.exception.UserAlreadyExistsException;
@@ -11,10 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.context.WebApplicationContext;
@@ -23,7 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class AuthIntegrationTest {
+public class LoginControllerTest {
 
     @Autowired
     private WebApplicationContext context;
@@ -33,11 +29,11 @@ public class AuthIntegrationTest {
     @MockitoBean
     private LoginService loginService;
 
-    @MockitoBean
-    private JwtFilter jwtFilter;
-
-    @MockitoBean
-    CustomUserDetailsService userDetailsService;
+//    @MockitoBean
+//    private JwtFilter jwtFilter;
+//
+//    @MockitoBean
+//    CustomUserDetailsService userDetailsService;
 
     @BeforeEach
     public void setup(WebApplicationContext context){
@@ -45,7 +41,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    public void validSignup(){
+    public void signup_happy_returnsCreated(){
         client.post()
                 .uri("/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -55,7 +51,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    public void invalidInputSignup(){
+    public void signup_badInput_returnsBadRequest(){
         client.post()
                 .uri("/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +62,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    public void duplicateUser(){
+    public void signup_duplicateUser_returns409(){
         Mockito.doThrow(UserAlreadyExistsException.class).when(loginService).signup(any());
         client.post()
                 .uri("/auth/signup")
@@ -77,7 +73,7 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    public void validLogin(){
+    public void login_happy_returnsToken(){
         when(loginService.login(any())).thenReturn(new AuthResponse("token", "Bearer", 60));
 
         client.post()
@@ -91,7 +87,9 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    public void badCredentials(){
+    public void login_badCredentials_returnsUnauthorized(){
+        when(loginService.login(any())).thenThrow(BadCredentialsException.class);
+
         client.post()
                 .uri("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
