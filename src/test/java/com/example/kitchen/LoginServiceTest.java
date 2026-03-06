@@ -42,7 +42,7 @@ public class LoginServiceTest {
     private LoginService service;
 
     @Test
-    public void loginValidCredentials(){
+    public void login_validCredentials_returnsToken(){
         Authentication authentication = new UsernamePasswordAuthenticationToken("ethan", "password");
         when(auth.authenticate(authentication)).thenReturn(new UsernamePasswordAuthenticationToken("ethan", null, Collections.emptyList()));
         when(jwtService.createJWT(any())).thenReturn("token");
@@ -54,7 +54,7 @@ public class LoginServiceTest {
     }
 
     @Test
-    public void loginBadCredentials(){
+    public void login_badCredentials_throwsException(){
         when(auth.authenticate(any())).thenThrow(BadCredentialsException.class);
         AuthRequest auth = new AuthRequest("ethan", "password");
         assertThrows(BadCredentialsException.class, ()-> service.login(auth));
@@ -62,21 +62,18 @@ public class LoginServiceTest {
 
 
     @Test
-    public void signUpSuccess(){
+    public void signup_success(){
         when(repo.findByUsername(any())).thenReturn(null);
         when(encoder.encode(any())).thenReturn("encoded");
         AuthRequest request = new AuthRequest("ethan", "password");
-
         service.signup(request);
-
         verify(repo).save(argThat(user->user.getUsername().equals("ethan") && user.getPassword().equals("encoded")));
-
 
 
     }
 
     @Test
-    public void signUpUserExists(){
+    public void signup_userAlreadyExists_throwsException(){
 
         when(repo.findByUsername(any())).thenReturn(new User());
         AuthRequest auth = new AuthRequest("username", "password");
