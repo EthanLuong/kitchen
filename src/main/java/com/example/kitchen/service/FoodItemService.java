@@ -8,12 +8,15 @@ import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+@Transactional(readOnly = true)
 @Service
 public class FoodItemService {
 
@@ -26,7 +29,7 @@ public class FoodItemService {
     }
 
     // ── Create ─────────────────────────────────────────────────
-
+    @Transactional
     public FoodItemResponse addItem(String username, FoodItemRequest request) {
         User user = userRepo.findByUsername(username);
         if (user == null) {
@@ -65,13 +68,13 @@ public class FoodItemService {
     }
 
     // ── Update ─────────────────────────────────────────────────
-
+    @Transactional
     public FoodItemResponse updateItem(String username, Long id, FoodItemRequest request) {
         FoodItem existing = findOwnedItem(username, id);
         applyRequest(existing, request);
         return FoodItemResponse.from(foodRepo.save(existing));
     }
-
+    @Transactional
     public FoodItemResponse markConsumed(String username, Long id) {
         FoodItem item = findOwnedItem(username, id);
         item.setConsumed(true);
@@ -79,7 +82,7 @@ public class FoodItemService {
     }
 
     // ── Delete (soft) ──────────────────────────────────────────
-
+    @Transactional
     public void deleteItem(String username, Long id) {
         FoodItem item = findOwnedItem(username, id);
         item.setDeletedAt(LocalDateTime.now());
