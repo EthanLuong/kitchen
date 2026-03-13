@@ -1,0 +1,41 @@
+#root {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  font-family: "Courier New", Courier, monospace;
+}
+
+body {
+  background-color: darkgray;
+}
+
+.foodcard {
+  margin: 0 auto;
+  display: flex;
+  width: 50%;
+  background-color: lightgray;
+  padding: 1rem;
+  border-color: black;
+  border-style: solid;
+  text-align: start;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  padding: 1rem;
+}
