@@ -268,6 +268,7 @@ public class FoodItemControllerTest {
 
 
     @Test
+
     public void noAuth_returns401() {
         when(jwtService.getSubject(any())).thenReturn(null);
         client.get().uri("/items")
