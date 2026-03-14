@@ -169,7 +169,7 @@ export type FoodType =
   | "DRY_GOODS"
   | "FROZEN"
   | "BEVERAGE";
-export type Location = "FRIDGE" | "FREEZER" | "PANTRY";
+export type FoodLocation = "FRIDGE" | "FREEZER" | "PANTRY";
 
 export type FoodItem = {
   id: number;
@@ -177,7 +177,7 @@ export type FoodItem = {
   type: FoodType;
   quantity: number;
   unit: Unit;
-  location: Location;
+  location: FoodLocation;
   expirationDate: Date;
   purchaseDate?: Date;
   openedAt?: Date;

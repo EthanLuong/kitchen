@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { sampleFoodItems, type FoodItem } from "./data/sampleFoodList";
+import {
+  sampleFoodItems,
+  type FoodItem,
+  type FoodLocation,
+  type FoodType,
+} from "./data/sampleFoodList";
 import "./App.css";
 
 type FoodListProps = {
@@ -15,6 +20,11 @@ type FoodCardProps = {
 type AuthenticationModalProps = {
   isOpen: boolean;
   setToken: (token: string) => void;
+};
+
+type FIlterBarProps = {
+  setLocationFilter: (location: FoodLocation | null) => void;
+  setTypeFilter: (type: FoodType | null) => void;
 };
 
 function AuthenticationModal({ isOpen, setToken }: AuthenticationModalProps) {
@@ -57,8 +67,26 @@ function AuthenticationModal({ isOpen, setToken }: AuthenticationModalProps) {
   );
 }
 
-function FilterBar() {
-  return <div className="filterbar"></div>;
+function FilterBar({ setLocationFilter, setTypeFilter }: FIlterBarProps) {
+  return (
+    <div className="filterbar">
+      <div>
+        <button onClick={() => setLocationFilter("FRIDGE")}>Fridge</button>
+        <button onClick={() => setLocationFilter("FREEZER")}>Freezer</button>
+        <button onClick={() => setLocationFilter("PANTRY")}>Pantry</button>
+        <button onClick={() => setLocationFilter(null)}>Clear</button>
+      </div>
+      <div>
+        <button onClick={() => setTypeFilter("PRODUCE")}>Produce</button>
+        <button onClick={() => setTypeFilter("DAIRY")}>Dairy</button>
+        <button onClick={() => setTypeFilter("MEAT")}>Meat</button>
+        <button onClick={() => setTypeFilter("DRY_GOODS")}>Dry Goods</button>
+        <button onClick={() => setTypeFilter("FROZEN")}>Frozen</button>
+        <button onClick={() => setTypeFilter("BEVERAGE")}>Beverage</button>
+        <button onClick={() => setTypeFilter(null)}>Clear</button>
+      </div>
+    </div>
+  );
 }
 
 function FoodCard({ item, onDelete }: FoodCardProps) {
@@ -91,11 +119,23 @@ function FoodList({ foodList, onDelete }: FoodListProps) {
 function App() {
   const [foodList, setFoodList] = useState<FoodItem[]>(sampleFoodItems);
   const [authToken, setToken] = useState<string>("");
+  const [locationFilter, setLocationFilter] = useState<FoodLocation | null>(
+    null,
+  );
+  const [typeFilter, setTypeFilter] = useState<FoodType | null>(null);
   const isOpen = authToken == "" ? true : false;
 
   function handleDeleteFoodItem(item: FoodItem) {
     setFoodList((foodList) => foodList.filter((x) => x.id != item.id));
   }
+
+  console.log(locationFilter, typeFilter);
+
+  const visibleItems = foodList
+    .filter((item) => (locationFilter ? item.location == locationFilter : true))
+    .filter((item) => (typeFilter ? item.type == typeFilter : true));
+
+  console.log(visibleItems);
 
   return (
     <>
@@ -103,7 +143,11 @@ function App() {
         isOpen={isOpen}
         setToken={setToken}
       ></AuthenticationModal>
-      <FoodList foodList={foodList} onDelete={handleDeleteFoodItem} />{" "}
+      <FilterBar
+        setTypeFilter={setTypeFilter}
+        setLocationFilter={setLocationFilter}
+      ></FilterBar>
+      <FoodList foodList={visibleItems} onDelete={handleDeleteFoodItem} />{" "}
     </>
   );
 }
