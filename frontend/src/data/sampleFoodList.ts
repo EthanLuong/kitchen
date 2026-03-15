@@ -153,36 +153,3 @@ export const sampleFoodItems: FoodItem[] = [
     updatedAt: daysFromNow(-2),
   },
 ];
-
-export type Unit =
-  | "GRAM"
-  | "KILOGRAM"
-  | "MILLILITER"
-  | "LITER"
-  | "PIECE"
-  | "TABLESPOON"
-  | "TEASPOON";
-export type FoodType =
-  | "PRODUCE"
-  | "DAIRY"
-  | "MEAT"
-  | "DRY_GOODS"
-  | "FROZEN"
-  | "BEVERAGE";
-export type FoodLocation = "FRIDGE" | "FREEZER" | "PANTRY";
-
-export type FoodItem = {
-  id: number;
-  name: string;
-  type: FoodType;
-  quantity: number;
-  unit: Unit;
-  location: FoodLocation;
-  expirationDate: Date;
-  purchaseDate?: Date;
-  openedAt?: Date;
-  notes?: string;
-  consumed?: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
