@@ -101,13 +101,15 @@ function AuthenticationModal({ isOpen, setToken }: AuthenticationModalProps) {
 function FilterBar({ setLocationFilter, setTypeFilter }: FilterBarProps) {
   return (
     <div className="filterbar">
-      <div>
+      <div className="filterrow">
+        <span>Location</span>
         <button onClick={() => setLocationFilter("FRIDGE")}>Fridge</button>
         <button onClick={() => setLocationFilter("FREEZER")}>Freezer</button>
         <button onClick={() => setLocationFilter("PANTRY")}>Pantry</button>
         <button onClick={() => setLocationFilter(null)}>Clear</button>
       </div>
-      <div>
+      <div className="filterrow">
+        <span>Type</span>
         <button onClick={() => setTypeFilter("PRODUCE")}>Produce</button>
         <button onClick={() => setTypeFilter("DAIRY")}>Dairy</button>
         <button onClick={() => setTypeFilter("MEAT")}>Meat</button>
@@ -123,31 +125,45 @@ function FilterBar({ setLocationFilter, setTypeFilter }: FilterBarProps) {
 function FoodCard({ item, onDelete, setEdit }: FoodCardProps) {
   return (
     <div className="foodcard">
-      <div className="foodinfo">
-        <h1>{item.name}</h1>
-        <h2>
-          {item.quantity + " "}
+      <div className="badges">
+        <h1>{item.location}</h1>
+        <h1>{item.foodType}</h1>
+      </div>
+      <div className="iteminfo">
+        <h1 className="itemName">{item.name}</h1>
+        <h2 className="quantity">
+          <span className="number">{item.quantity + " "}</span>
           {item.unit + " "}
-          {item.foodType + " "}
-          {item.location}
         </h2>
       </div>
 
-      <h1 className="expdate">
-        {new Date(item.expirationDate).toLocaleDateString()}
-      </h1>
-      <button className="deleteitem" onClick={() => onDelete(item)}>
-        Delete
-      </button>
-      <button onClick={() => setEdit(item)}>Edit</button>
+      <div className="cardfooter">
+        <h1 className="expdate">
+          {new Date(item.expirationDate).toLocaleDateString().slice(0, -5)}
+        </h1>
+        <button className="deleteitem" onClick={() => onDelete(item)}>
+          Delete
+        </button>
+        <button onClick={() => setEdit(item)}>Edit</button>
+      </div>
     </div>
   );
 }
 
 function FoodList({ foodList, onDelete, setEdit }: FoodListProps) {
-  return foodList.map((item) => (
-    <FoodCard item={item} key={item.id} onDelete={onDelete} setEdit={setEdit} />
-  ));
+  return (
+    <div className="foodlist">
+      {foodList.map((item) => (
+        <FoodCard
+          item={item}
+          key={item.id}
+          onDelete={onDelete}
+          setEdit={setEdit}
+        />
+      ))}
+      <button className="buttoncard">Add Item</button>
+    </div>
+  );
 }
 
 function AddFoodModal({
@@ -191,38 +207,56 @@ function AddFoodModal({
 
   return (
     <div className="overlay">
-      <form action={handleSubmit}>
-        <input type="text" name="name" />
-        <input type="number" name="quantity" min="0" step="1"></input>
-
-        <select name="unit">
-          {UNIT.map((unit) => (
-            <option key={unit} value={unit}>
-              {unit}
-            </option>
-          ))}
-        </select>
-
-        <select name="type">
-          {TYPE.map((type) => (
-            <option key={type} value={type}>
-              {type}
-            </option>
-          ))}
-        </select>
-        <select name="location">
-          {LOCATIONS.map((location) => (
-            <option key={location} value={location}>
-              {location}
-            </option>
-          ))}
-        </select>
-        <input type="date" name="expirationDate"></input>
-        <button type="submit" disabled={loading}>
-          Add Item
-        </button>
-      </form>
-      <button onClick={onClose}>Exit</button>
+      <div className="modalcard">
+        <form action={handleSubmit}>
+          <div className="formitem">
+            <label htmlFor="name">Name: </label>
+            <input type="text" name="name" className="textinput" />
+          </div>
+          <div className="formitem">
+            <label htmlFor="quantity">Qty:</label>
+            <input
+              type="number"
+              name="quantity"
+              min="0"
+              step="1"
+              className="numberinput"
+            ></input>
+            <select name="unit">
+              {UNIT.map((unit) => (
+                <option key={unit} value={unit}>
+                  {unit}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="formitem">
+            <select name="type">
+              {TYPE.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+            <select name="location">
+              {LOCATIONS.map((location) => (
+                <option key={location} value={location}>
+                  {location}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="formitem">
+            {" "}
+            <input type="date" name="expirationDate"></input>
+            <button type="submit" disabled={loading}>
+              Add Item
+            </button>
+          </div>
+          <div className="formitem"></div>
+        </form>
+        <button onClick={onClose}>Exit</button>
+      </div>
     </div>
   );
 }
@@ -351,6 +385,7 @@ function App() {
   function handleAddedItem(item: FoodItemResponse) {
     setFoodList((prev) => [...prev, item]);
   }
+
   function handleEditItem(item: FoodItemResponse) {
     setFoodList((foodList) =>
       foodList.map((original) => (original.id != item.id ? original : item)),

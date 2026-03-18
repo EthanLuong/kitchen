@@ -1,28 +1,68 @@
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=Source+Sans+3:wght@200;500&display=swap");
+
 #root {
   max-width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  font-family: "Courier New", Courier, monospace;
+  font-family: "Lora", Georgia, serif;
+  --tc: #a84b25; /* terracotta — primary accent, top band, buttons */
+  --tc-pale: #f5e0d4; /* terracotta tint — item pill background */
+  --tc-light: #c97050; /* terracotta mid — focus borders, hover states */
+
+  --sage: #627358; /* sage green — login accent, login button */
+  --sage-pale: #e6ede0; /* sage tint — login icon background */
+
+  --cream: #f4eee1; /* page background, input backgrounds */
+  --card: #fdfaf4; /* modal/card surface, slightly warmer than white */
+
+  --ink: #2c1810; /* primary text — headings, input values */
+  --mid: #7a5244; /* secondary text — labels, hints, placeholder */
+
+  --sand: #c8b49a; /* borders — inputs, buttons, dividers */
+  --sand-lt: #ede5d4; /* subtle borders — card edges, divider lines */
+}
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  border: 1px solid #ccc;
+  font-family: "Source Sans 3", sans-serif;
+  margin: 0 0.5rem;
+}
+body {
+  background-color: #f4eee1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  background-color: darkgray;
+.foodlist {
+  margin: 0 auto;
+  display: grid;
+  width: 80%;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 5rem;
 }
 
 .foodcard {
-  margin: 0 auto;
+  font-family: "Source Sans 3", sans-serif;
+  overflow: hidden;
+  margin: 0;
   display: flex;
-  width: 50%;
-  background-color: lightgray;
-  padding: 1rem;
-  border-color: black;
-  border-style: solid;
+  width: 100%;
+  background-color: #fdfaf4;
   text-align: start;
-  align-items: center;
+  align-items: start;
   justify-content: space-around;
+  flex-direction: column;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  border-radius: 16px;
 }
-
+.iteminfo {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
 .overlay {
   position: fixed;
   inset: 0;
@@ -37,5 +77,95 @@ body {
   display: flex;
   flex-direction: column;
   background: white;
+  padding-left: 1rem;
+  padding-top: 0.25rem;
+}
+
+.badges {
+  display: flex;
+  width: 100%;
+  font-size: 0.5rem;
+  letter-spacing: 0.15rem;
+  font-weight: 200;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+  justify-content: space-between;
+}
+
+.badges h1 {
+  background-color: gray;
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  margin: 0;
+}
+
+.cardfooter {
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.itemName {
+  font-size: 3rem;
+  margin: 0.5rem 0;
+}
+.quantity {
+  margin: 0.5rem 0;
+}
+
+.number {
+  font-size: 3rem;
+}
+
+.filterbar {
+  width: 80%;
+  margin: 2rem auto;
+}
+
+.filterrow {
+  font-size: 2rem;
+  display: flex;
+
+  padding: 0.5rem 0;
+  align-items: center;
+  text-align: left;
+}
+.filterrow span {
+  width: 150px;
+}
+
+.buttoncard {
+  border-style: dashed;
+}
+
+.modalcard {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card);
+  padding: 2rem;
+  margin: 1rem;
+  position: relative;
+}
+
+.modalcard form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.formitem {
   padding: 1rem;
+  width: 100;
+}
+
+.formitem input {
+  border-style: solid;
+  border-radius: 8px;
+  padding: 0.25rem;
+  margin: 0 0.25rem;
+}
+.formitem select {
 }
