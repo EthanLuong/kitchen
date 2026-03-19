@@ -72,7 +72,11 @@ export default function ItemModal({
           name="expirationDate"
           defaultValue={defaultValues.expirationDate}
         ></input>
-        <button type="submit">{initialValue ? "Edit Item" : "Add Item"}</button>
+        <button type="submit">
+          {initialValue != null && initialValue != "add"
+            ? "Edit Item"
+            : "Add Item"}
+        </button>
       </form>
       <button onClick={() => setIsOpen(null)}>Exit</button>
     </div>

@@ -20,6 +20,9 @@ export const LOCATIONS = [
   "OTHER",
 ] as const;
 
+export const SORT_TYPE = ["name", "location", "type"] as const;
+export type SortOptions = (typeof SORT_TYPE)[number];
+
 export type Token = string;
 export type Unit = (typeof UNIT)[number];
 export type FoodType = (typeof TYPE)[number];
