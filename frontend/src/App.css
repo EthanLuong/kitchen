@@ -167,5 +167,7 @@ body {
   padding: 0.25rem;
   margin: 0 0.25rem;
 }
-.formitem select {
+
+.selected {
+  background-color: gray;
 }
