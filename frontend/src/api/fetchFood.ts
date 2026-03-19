@@ -38,7 +38,7 @@ export async function createNewFoodItem(
   });
 
   if (!response.ok) {
-    throw new Error();
+    throw new Error("Failed to create new item");
   }
   const data = await response.json();
   return data;
@@ -76,12 +76,33 @@ export async function deleteFoodItem(id: number, token: Token): Promise<void> {
   }
 }
 
-//TODO: ADD AUTH API CALLS
 export async function getTokenLogin(
   username: string,
   password: string,
-): Promise<Token>;
+): Promise<Token> {
+  const response = await fetch(`${BASE_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Bad Login");
+  }
+  const result = await response.json();
+  return result.accessToken as Token;
+}
 export async function createNewUser(
   username: string,
   password: string,
-): Promise<void>;
+): Promise<void> {
+  const response = await fetch(`${BASE_URL}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create user");
+  }
+}
