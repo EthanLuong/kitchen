@@ -60,8 +60,8 @@ public class FoodItemControllerTest {
 
     @Test
     public void getAll_happy_returnsOk() {
-        when(service.getAllItems(any())).thenReturn(List.of(SAMPLE_RESPONSE));
-        client.get().uri("/items")
+        when(service.getAllItems(any(), any())).thenReturn(List.of(SAMPLE_RESPONSE));
+        client.get().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
@@ -73,7 +73,7 @@ public class FoodItemControllerTest {
     @Test
     public void getOne_happy_returnsOk() {
         when(service.getItem(any(), eq(1L))).thenReturn(SAMPLE_RESPONSE);
-        client.get().uri("/items/1")
+        client.get().uri("/v1/items/1")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
@@ -85,7 +85,7 @@ public class FoodItemControllerTest {
     public void getOne_notFound_returns404() {
         when(service.getItem(any(), eq(99L)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
-        client.get().uri("/items/99")
+        client.get().uri("/v1/items/99")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isNotFound();
@@ -95,7 +95,7 @@ public class FoodItemControllerTest {
     @Test
     public void getExpiring_happy_returnsOk() {
         when(service.getExpiringSoon(any(), eq(7))).thenReturn(List.of(SAMPLE_RESPONSE));
-        client.get().uri("/items/expiring?days=7")
+        client.get().uri("/v1/items/expiring?days=7")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
@@ -107,7 +107,7 @@ public class FoodItemControllerTest {
     @Test
     public void getByLocation_happy_returnsOk() {
         when(service.getByLocation(any(), eq(FoodItem.Location.FRIDGE))).thenReturn(List.of(SAMPLE_RESPONSE));
-        client.get().uri("/items/location/FRIDGE")
+        client.get().uri("/v1/items/location/FRIDGE")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
@@ -117,18 +117,18 @@ public class FoodItemControllerTest {
 
     @Test
     public void getByLocation_invalidEnum_returns400() {
-        client.get().uri("/items/location/GARAGE")
+        client.get().uri("/v1/items/location/GARAGE")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isBadRequest();
     }
 
-    // ── GET /items/type/{type} ──────────────────────────────
+    // ── GET /v1/items/type/{type} ──────────────────────────────
 
     @Test
     public void getByType_happy_returnsOk() {
         when(service.getByFoodType(any(), eq(FoodItem.FoodType.DAIRY))).thenReturn(List.of(SAMPLE_RESPONSE));
-        client.get().uri("/items/type/DAIRY")
+        client.get().uri("/v1/items/type/DAIRY")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
@@ -138,7 +138,7 @@ public class FoodItemControllerTest {
 
     @Test
     public void getByType_invalidEnum_returns400() {
-        client.get().uri("/items/type/CANDY")
+        client.get().uri("/v1/items/type/CANDY")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -148,7 +148,7 @@ public class FoodItemControllerTest {
     @Test
     public void create_happy_returns201() {
         when(service.addItem(any(), any())).thenReturn(SAMPLE_RESPONSE);
-        client.post().uri("/items")
+        client.post().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0,
@@ -161,7 +161,7 @@ public class FoodItemControllerTest {
 
     @Test
     public void create_missingName_returns400() {
-        client.post().uri("/items")
+        client.post().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("", FoodItem.FoodType.DAIRY, 1.0,
@@ -172,7 +172,7 @@ public class FoodItemControllerTest {
 
     @Test
     public void create_missingFoodType_returns400() {
-        client.post().uri("/items")
+        client.post().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("Milk", null, 1.0,
@@ -188,7 +188,7 @@ public class FoodItemControllerTest {
                 1L, "Oat Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
                 FoodItem.Location.FRIDGE, null, null, null, null, false, null, null);
         when(service.updateItem(any(), eq(1L), any())).thenReturn(updated);
-        client.put().uri("/items/1")
+        client.put().uri("/v1/items/1")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("Oat Milk", FoodItem.FoodType.DAIRY, 1.0,
@@ -203,7 +203,7 @@ public class FoodItemControllerTest {
     public void update_notFound_returns404() {
         when(service.updateItem(any(), eq(99L), any()))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
-        client.put().uri("/items/99")
+        client.put().uri("/v1/items/99")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0,
@@ -214,7 +214,7 @@ public class FoodItemControllerTest {
 
     @Test
     public void update_invalidBody_returns400() {
-        client.put().uri("/items/1")
+        client.put().uri("/v1/items/1")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("", null, null, null, null, null, null, null, null))
@@ -229,7 +229,7 @@ public class FoodItemControllerTest {
                 1L, "Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
                 FoodItem.Location.FRIDGE, null, null, null, null, true, null, null);
         when(service.markConsumed(any(), eq(1L))).thenReturn(consumed);
-        client.patch().uri("/items/1/consume")
+        client.patch().uri("/v1/items/1/consume")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
@@ -241,7 +241,7 @@ public class FoodItemControllerTest {
     public void consume_notFound_returns404() {
         when(service.markConsumed(any(), eq(99L)))
                 .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
-        client.patch().uri("/items/99/consume")
+        client.patch().uri("/v1/items/99/consume")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isNotFound();
@@ -250,7 +250,7 @@ public class FoodItemControllerTest {
 
     @Test
     public void delete_happy_returns204() {
-        client.delete().uri("/items/1")
+        client.delete().uri("/v1/items/1")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isNoContent();
@@ -260,7 +260,7 @@ public class FoodItemControllerTest {
     public void delete_notFound_returns404() {
         doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"))
                 .when(service).deleteItem(any(), eq(99L));
-        client.delete().uri("/items/99")
+        client.delete().uri("/v1/items/99")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isNotFound();
@@ -271,7 +271,7 @@ public class FoodItemControllerTest {
 
     public void noAuth_returns401() {
         when(jwtService.getSubject(any())).thenReturn(null);
-        client.get().uri("/items")
+        client.get().uri("/v1/items")
                 .exchange()
                 .expectStatus().isForbidden();
     }

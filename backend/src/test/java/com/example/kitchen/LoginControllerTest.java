@@ -43,7 +43,7 @@ public class LoginControllerTest {
     @Test
     public void signup_happy_returnsCreated(){
         client.post()
-                .uri("/auth/signup")
+                .uri("/v1/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new AuthRequest("ethan", "password"))
                 .exchange()
@@ -53,7 +53,7 @@ public class LoginControllerTest {
     @Test
     public void signup_badInput_returnsBadRequest(){
         client.post()
-                .uri("/auth/signup")
+                .uri("/v1/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new AuthRequest("", "password"))
                 .exchange()
@@ -65,7 +65,7 @@ public class LoginControllerTest {
     public void signup_duplicateUser_returns409(){
         Mockito.doThrow(UserAlreadyExistsException.class).when(loginService).signup(any());
         client.post()
-                .uri("/auth/signup")
+                .uri("/v1/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new AuthRequest("test", "password"))
                 .exchange()
@@ -77,7 +77,7 @@ public class LoginControllerTest {
         when(loginService.login(any())).thenReturn(new AuthResponse("token", "Bearer", 60));
 
         client.post()
-                .uri("/auth/login")
+                .uri("/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new AuthRequest("test", "password"))
                 .exchange()
@@ -91,9 +91,9 @@ public class LoginControllerTest {
         when(loginService.login(any())).thenThrow(BadCredentialsException.class);
 
         client.post()
-                .uri("/auth/login")
+                .uri("/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new AuthRequest("zdffg", "zdfsdf"))
+                .body(new AuthRequest("zdffg", "strongpassword"))
                 .exchange()
                 .expectStatus().isUnauthorized();
     }

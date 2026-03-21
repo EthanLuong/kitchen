@@ -1,6 +1,8 @@
 package com.example.kitchen.repository;
 
 import com.example.kitchen.data.FoodItem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +14,8 @@ import java.util.UUID;
 public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
 
     // All active (non-deleted, non-consumed) items for a user
-    List<FoodItem> findByUserUseridAndDeletedAtIsNullAndConsumedFalse(UUID userid);
+
+    Page<FoodItem> findByUserUseridAndDeletedAtIsNullAndConsumedFalse(UUID userid, Pageable pageable);
 
     // Expiring within N days for a user
     @Query("SELECT f FROM FoodItem f WHERE f.user.userid = :userid " +

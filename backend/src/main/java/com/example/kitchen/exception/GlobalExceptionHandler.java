@@ -1,39 +1,53 @@
 package com.example.kitchen.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<String> handleUserExists(UserAlreadyExistsException ex){
-        return ResponseEntity.status(HttpStatus.CONFLICT).body( ex.getMessage());
+    public  ProblemDetail handleUserExists(UserAlreadyExistsException ex){
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "User already exists");
+        response.setTitle("Invalid registration");
+        return response;
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body( ex.getMessage());
+    public ProblemDetail handleBadCredentials(BadCredentialsException ex){
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Credentials provided were incorrect");
+        response.setTitle("Bad Credentials");
+        return response;
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String,String>> handleInvalidRequest(MethodArgumentNotValidException ex){
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error->errors.put(error.getField(), error.getDefaultMessage()));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    public ProblemDetail handleInvalidRequest(MethodArgumentNotValidException ex){
+        String details = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, details);
+
+        response.setTitle("Invalid arguments");
+
+        return response;
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<String> handleResponseStatus(ResponseStatusException ex){
-        return ResponseEntity.status(ex.getStatusCode()).body(ex.getReason());
+    public ProblemDetail handleResponseStatus(ResponseStatusException ex){
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(ex.getStatusCode(), "Something went wrong");
+        response.setTitle("Internal Server Error");
+
+        return response;
+
     }
 
 }

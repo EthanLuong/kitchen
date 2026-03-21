@@ -14,6 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.example.kitchen.data.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -71,10 +74,11 @@ public class FoodServiceTest {
     @Test
     public void getAllItems_returnsList() {
         FoodItem item = makeItem(makeUser(USER_ID));
-        List<FoodItem> list = new ArrayList<>();
+        List<FoodItem> list = new ArrayList<FoodItem>();
         list.add(item);
-        when(foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(any())).thenReturn(list);
-        List<FoodItemResponse> responseList = service.getAllItems(USER_ID);
+        Page<FoodItem> page = new PageImpl<FoodItem>(list);
+        when(foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(any(), any())).thenReturn(page);
+        List<FoodItemResponse> responseList = service.getAllItems(USER_ID, PageRequest.of(0,50));
         assertEquals(list.get(0).getId(), responseList.get(0).id());
     }
 
