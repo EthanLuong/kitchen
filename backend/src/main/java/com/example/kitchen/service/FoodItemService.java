@@ -39,7 +39,7 @@ public class FoodItemService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         FoodItem item = applyRequest(new FoodItem(), request);
         item.setUser(user);
-
+        log.info("Item with id {} created for user with UUID {}", item.getId(), userId);
         return FoodItemResponse.from(foodRepo.save(item));
     }
 
@@ -48,27 +48,32 @@ public class FoodItemService {
     // ── Read ───────────────────────────────────────────────────
 
     public List<FoodItemResponse> getAllItems(UUID userId, Pageable pageable) {
-
+        log.info("Getting all items for UUID {}", userId);
         return foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(userId, pageable)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
     public FoodItemResponse getItem(UUID userId, Long id) {
+
+        log.info("Getting item with id {} for user with UUID {}", id, userId);
         return FoodItemResponse.from(findOwnedItem(userId, id));
     }
 
     public List<FoodItemResponse> getExpiringSoon(UUID userId, int days) {
+        log.info("Getting items expiring within {} days for user with UUID {}", days, userId);
         LocalDate cutoff = LocalDate.now().plusDays(days);
         return foodRepo.findExpiringSoon(userId, cutoff)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
     public List<FoodItemResponse> getByLocation(UUID userId, FoodItem.Location location) {
+        log.info("Getting items in location {} for user with UUID {}", location, userId);
         return foodRepo.findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(userId, location)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
     public List<FoodItemResponse> getByFoodType(UUID userId, FoodItem.FoodType type) {
+        log.info("Getting items with type {} for user with UUID {}", type, userId);
         return foodRepo.findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(userId, type)
                 .stream().map(FoodItemResponse::from).toList();
     }
@@ -76,6 +81,7 @@ public class FoodItemService {
     // ── Update ─────────────────────────────────────────────────
     @Transactional
     public FoodItemResponse updateItem(UUID userId, Long id, FoodItemRequest request) {
+        log.info("Updating item with id {} for user with UUID {}", id, userId);
         FoodItem existing = findOwnedItem(userId, id);
         applyRequest(existing, request);
         return FoodItemResponse.from(foodRepo.save(existing));
@@ -83,6 +89,7 @@ public class FoodItemService {
     
     @Transactional
     public FoodItemResponse markConsumed(UUID userId, Long id) {
+        log.info("Marking item with id {} consumed for user with UUID {}", id, userId);
         FoodItem item = findOwnedItem(userId, id);
         item.setConsumed(true);
         return FoodItemResponse.from(foodRepo.save(item));
@@ -91,6 +98,7 @@ public class FoodItemService {
     // ── Delete (soft) ──────────────────────────────────────────
     @Transactional
     public void deleteItem(UUID userId, Long id) {
+        log.info("Deleting item with id {} for user with UUID {}", id, userId);
         FoodItem item = findOwnedItem(userId, id);
         item.setDeletedAt(LocalDateTime.now());
         foodRepo.save(item);
