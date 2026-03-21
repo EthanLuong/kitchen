@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public  ProblemDetail handleUserExists(UserAlreadyExistsException ex){
+    public ProblemDetail handleUserExists(UserAlreadyExistsException ex){
         log.warn("User already exists: {}", ex.getMessage());
         ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "User already exists");
         response.setTitle("Invalid registration");

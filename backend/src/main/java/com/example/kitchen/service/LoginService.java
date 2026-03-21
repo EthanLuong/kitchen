@@ -6,6 +6,7 @@ import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,9 @@ public class LoginService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
 
+    @Value("${jwt.expiration}")
+    private int expirationTime;
+
     public LoginService(AuthenticationManager auth, UserRepository repo,
                         PasswordEncoder encoder, JwtService jwtService) {
         this.auth = auth;
@@ -37,7 +41,7 @@ public class LoginService {
                 new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
         return new AuthResponse(
-                jwtService.createJWT(authentication.getName()), "Bearer", 3600);
+                jwtService.createJWT(authentication.getName()), "Bearer", expirationTime);
     }
 
     @Transactional

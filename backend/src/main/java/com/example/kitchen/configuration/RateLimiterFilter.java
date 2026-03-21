@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,7 +38,7 @@ public class RateLimiterFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } else{
             log.warn("Rate limit exceeded for IP {}", ip);
-            response.setStatus(429);
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.getWriter().write("Too many requests");
         }
     }

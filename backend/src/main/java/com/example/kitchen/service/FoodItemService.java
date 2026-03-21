@@ -60,20 +60,20 @@ public class FoodItemService {
     }
 
     public List<FoodItemResponse> getExpiringSoon(UUID userId, int days) {
-        log.info("Getting items expring within {} days for user with UUID {}", days, userId);
+        log.info("Getting items expiring within {} days for user with UUID {}", days, userId);
         LocalDate cutoff = LocalDate.now().plusDays(days);
         return foodRepo.findExpiringSoon(userId, cutoff)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
     public List<FoodItemResponse> getByLocation(UUID userId, FoodItem.Location location) {
-        log.info("Getting items in location {} days for user with UUID {}", location, userId);
+        log.info("Getting items in location {} for user with UUID {}", location, userId);
         return foodRepo.findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(userId, location)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
     public List<FoodItemResponse> getByFoodType(UUID userId, FoodItem.FoodType type) {
-        log.info("Getting items with type {} days for user with UUID {}", type, userId);
+        log.info("Getting items with type {} for user with UUID {}", type, userId);
         return foodRepo.findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(userId, type)
                 .stream().map(FoodItemResponse::from).toList();
     }
