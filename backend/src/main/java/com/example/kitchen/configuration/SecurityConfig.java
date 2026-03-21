@@ -1,5 +1,6 @@
 package com.example.kitchen.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,9 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfig {
 
+    @Value("${allowed.origin}")
+    String corsOrigin;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter, RateLimiterFilter rateLimiter) throws Exception {
         return http
@@ -30,7 +34,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**",
+                                "/v1/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html").permitAll()
@@ -57,7 +61,7 @@ public class SecurityConfig {
     @Bean
     UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("${allowed.origin}"));
+        configuration.setAllowedOrigins(Arrays.asList(corsOrigin));
         configuration.setAllowedMethods(Arrays.asList("GET","POST", "DELETE", "PUT"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

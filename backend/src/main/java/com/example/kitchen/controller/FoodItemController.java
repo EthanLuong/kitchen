@@ -5,6 +5,7 @@ import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
 import com.example.kitchen.service.FoodItemService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping("/v1/items")
 public class FoodItemController {
 
     private final FoodItemService service;
@@ -25,8 +26,9 @@ public class FoodItemController {
 
     // GET /items — all active items for the logged-in user
     @GetMapping
-    public ResponseEntity<List<FoodItemResponse>> getAll(Principal principal) {
-        return ResponseEntity.ok(service.getAllItems(userId(principal)));
+    public ResponseEntity<List<FoodItemResponse>> getAll(Principal principal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+
+        return ResponseEntity.ok(service.getAllItems(userId(principal), PageRequest.of(page, size)));
     }
 
     // GET /items/{id}
