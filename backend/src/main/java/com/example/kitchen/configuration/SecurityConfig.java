@@ -37,7 +37,8 @@ public class SecurityConfig {
                                 "/v1/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html").permitAll()
+                                "/swagger-ui.html",
+                                "/actuator/**").permitAll() //TODO: Remove actuator after roles are implemented
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(rateLimiter, JwtFilter.class)

@@ -5,6 +5,7 @@ import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class LoginService {
 
@@ -30,6 +32,7 @@ public class LoginService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest request) {
+        log.info("Attempting sign in for user with username {}", request.username());
         Authentication authentication = auth.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
@@ -39,6 +42,7 @@ public class LoginService {
 
     @Transactional
     public void signup(AuthRequest request) {
+        log.info("Attempting to create new user with username {}", request.username());
         User existingUser = repo.findByUsername(request.username());
         if (existingUser != null) {
             throw new UserAlreadyExistsException();
