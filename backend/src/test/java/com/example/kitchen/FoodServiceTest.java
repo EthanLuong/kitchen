@@ -74,12 +74,12 @@ public class FoodServiceTest {
     @Test
     public void getAllItems_returnsList() {
         FoodItem item = makeItem(makeUser(USER_ID));
-        List<FoodItem> list = new ArrayList<FoodItem>();
+        List<FoodItem> list = new ArrayList<>();
         list.add(item);
-        Page<FoodItem> page = new PageImpl<FoodItem>(list);
+        Page<FoodItem> page = new PageImpl<>(list);
         when(foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(any(), any())).thenReturn(page);
-        List<FoodItemResponse> responseList = service.getAllItems(USER_ID, PageRequest.of(0,50));
-        assertEquals(list.get(0).getId(), responseList.get(0).id());
+        Page<FoodItemResponse> responseList = service.getAllItems(USER_ID, PageRequest.of(0,50));
+        assertEquals(list.get(0).getId(), responseList.toList().get(0).id());
     }
 
     // ── getItem ─────────────────────────────────────────────
