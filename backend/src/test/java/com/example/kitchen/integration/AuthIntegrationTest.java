@@ -17,7 +17,6 @@ import org.springframework.test.web.servlet.client.RestTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
