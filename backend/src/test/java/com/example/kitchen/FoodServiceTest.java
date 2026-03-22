@@ -78,8 +78,8 @@ public class FoodServiceTest {
         list.add(item);
         Page<FoodItem> page = new PageImpl<FoodItem>(list);
         when(foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(any(), any())).thenReturn(page);
-        List<FoodItemResponse> responseList = service.getAllItems(USER_ID, PageRequest.of(0,50));
-        assertEquals(list.get(0).getId(), responseList.get(0).id());
+        Page<FoodItemResponse> responseList = service.getAllItems(USER_ID, PageRequest.of(0,50));
+        assertEquals(list.get(0).getId(), responseList.toList().get(0).id());
     }
 
     // ── getItem ─────────────────────────────────────────────

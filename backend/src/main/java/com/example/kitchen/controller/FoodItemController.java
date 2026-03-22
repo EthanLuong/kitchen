@@ -5,6 +5,7 @@ import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
 import com.example.kitchen.service.FoodItemService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class FoodItemController {
 
     // GET /items — all active items for the logged-in user
     @GetMapping
-    public ResponseEntity<List<FoodItemResponse>> getAll(Principal principal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<Page<FoodItemResponse>> getAll(Principal principal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
 
         return ResponseEntity.ok(service.getAllItems(userId(principal), PageRequest.of(page, size)));
     }

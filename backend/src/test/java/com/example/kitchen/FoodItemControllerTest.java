@@ -1,5 +1,9 @@
 package com.example.kitchen;
 
+import com.example.kitchen.configuration.JwtFilter;
+import com.example.kitchen.configuration.RateLimiterFilter;
+import com.example.kitchen.configuration.SecurityConfig;
+import com.example.kitchen.controller.FoodItemController;
 import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
@@ -8,17 +12,17 @@ import com.example.kitchen.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.RestTestClient;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
-
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,11 +33,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@WebMvcTest(FoodItemController.class)
+@Import({SecurityConfig.class, JwtFilter.class, RateLimiterFilter.class})
+@AutoConfigureRestTestClient
+@TestPropertySource(properties = "allowed.origin=http://localhost")
 public class FoodItemControllerTest {
-    @Autowired
-    private WebApplicationContext context;
 
+    @Autowired
     private RestTestClient client;
 
     @MockitoBean
@@ -41,6 +47,9 @@ public class FoodItemControllerTest {
 
     @MockitoBean
     private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
 
     private static final UUID USER_ID = UUID.randomUUID();
 
@@ -51,24 +60,20 @@ public class FoodItemControllerTest {
     );
 
     @BeforeEach
-    public void setup(WebApplicationContext context) {
-        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
-        client = RestTestClient.bindTo(mockMvc).build();
+    public void setup() {
         when(jwtService.getSubject(any())).thenReturn(USER_ID.toString());
     }
 
-
     @Test
     public void getAll_happy_returnsOk() {
-        when(service.getAllItems(any(), any())).thenReturn(List.of(SAMPLE_RESPONSE));
+        when(service.getAllItems(any(), any())).thenReturn(new PageImpl<>(List.of(SAMPLE_RESPONSE)));
         client.get().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$[0].id").isEqualTo(1);
+                .jsonPath("$.content[0].id").isEqualTo(1);
     }
-
 
     @Test
     public void getOne_happy_returnsOk() {
@@ -91,7 +96,6 @@ public class FoodItemControllerTest {
                 .expectStatus().isNotFound();
     }
 
-
     @Test
     public void getExpiring_happy_returnsOk() {
         when(service.getExpiringSoon(any(), eq(7))).thenReturn(List.of(SAMPLE_RESPONSE));
@@ -102,7 +106,6 @@ public class FoodItemControllerTest {
                 .expectBody()
                 .jsonPath("$[0].id").isEqualTo(1);
     }
-
 
     @Test
     public void getByLocation_happy_returnsOk() {
@@ -123,8 +126,6 @@ public class FoodItemControllerTest {
                 .expectStatus().isBadRequest();
     }
 
-    // ── GET /v1/items/type/{type} ──────────────────────────────
-
     @Test
     public void getByType_happy_returnsOk() {
         when(service.getByFoodType(any(), eq(FoodItem.FoodType.DAIRY))).thenReturn(List.of(SAMPLE_RESPONSE));
@@ -143,7 +144,6 @@ public class FoodItemControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest();
     }
-
 
     @Test
     public void create_happy_returns201() {
@@ -180,7 +180,6 @@ public class FoodItemControllerTest {
                 .exchange()
                 .expectStatus().isBadRequest();
     }
-
 
     @Test
     public void update_happy_returnsOk() {
@@ -222,7 +221,6 @@ public class FoodItemControllerTest {
                 .expectStatus().isBadRequest();
     }
 
-
     @Test
     public void consume_happy_returnsOk() {
         FoodItemResponse consumed = new FoodItemResponse(
@@ -247,7 +245,6 @@ public class FoodItemControllerTest {
                 .expectStatus().isNotFound();
     }
 
-
     @Test
     public void delete_happy_returns204() {
         client.delete().uri("/v1/items/1")
@@ -266,13 +263,11 @@ public class FoodItemControllerTest {
                 .expectStatus().isNotFound();
     }
 
-
     @Test
-
     public void noAuth_returns401() {
         when(jwtService.getSubject(any())).thenReturn(null);
         client.get().uri("/v1/items")
                 .exchange()
-                .expectStatus().isForbidden();
+                .expectStatus().isUnauthorized();
     }
 }

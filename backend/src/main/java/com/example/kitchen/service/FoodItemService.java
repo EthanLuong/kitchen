@@ -7,6 +7,7 @@ import com.example.kitchen.dto.FoodItemResponse;
 import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -47,10 +48,10 @@ public class FoodItemService {
 
     // ── Read ───────────────────────────────────────────────────
 
-    public List<FoodItemResponse> getAllItems(UUID userId, Pageable pageable) {
+    public Page<FoodItemResponse> getAllItems(UUID userId, Pageable pageable) {
         log.info("Getting all items for UUID {}", userId);
         return foodRepo.findByUserUseridAndDeletedAtIsNullAndConsumedFalse(userId, pageable)
-                .stream().map(FoodItemResponse::from).toList();
+                .map(FoodItemResponse::from);
     }
 
     public FoodItemResponse getItem(UUID userId, Long id) {
