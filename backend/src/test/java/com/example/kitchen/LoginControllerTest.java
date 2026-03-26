@@ -78,7 +78,7 @@ public class LoginControllerTest {
 
     @Test
     public void login_happy_returnsToken() {
-        when(loginService.login(any())).thenReturn(new AuthResponse("token", "Bearer", 60));
+        when(loginService.login(any())).thenReturn(new AuthResponse("token", "Bearer", 60, "refresh"));
 
         client.post()
                 .uri("/v1/auth/login")

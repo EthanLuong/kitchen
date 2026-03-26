@@ -7,5 +7,6 @@ public record AuthResponse(
         String accessToken,
         String tokenType,
         @Schema(description = "Expiration time of token")
-        long expiresIn
+        long expiresIn,
+        String refreshToken
 ) {}
