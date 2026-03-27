@@ -1,12 +1,15 @@
 package com.example.kitchen;
 
+import com.example.kitchen.data.RefreshToken;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
+import com.example.kitchen.dto.LoginResult;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import com.example.kitchen.service.JwtService;
 import com.example.kitchen.service.LoginService;
+import com.example.kitchen.service.RefreshTokenService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +22,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -37,6 +42,9 @@ public class LoginServiceTest {
     private  PasswordEncoder encoder;
     @Mock
     private  JwtService jwtService;
+    @Mock
+    private RefreshTokenService refreshService;
+
 
     @InjectMocks
     private LoginService service;
@@ -44,13 +52,19 @@ public class LoginServiceTest {
     @Test
     public void login_validCredentials_returnsToken(){
         Authentication authentication = new UsernamePasswordAuthenticationToken("ethan", "password");
-        when(auth.authenticate(authentication)).thenReturn(new UsernamePasswordAuthenticationToken("ethan", null, Collections.emptyList()));
+        RefreshToken refresh = new RefreshToken();
+        UUID refreshID = UUID.randomUUID();
+        refresh.setToken(refreshID);
+        when(auth.authenticate(authentication)).thenReturn(new UsernamePasswordAuthenticationToken(UUID.randomUUID(), null, Collections.emptyList()));
         when(jwtService.createJWT(any())).thenReturn("token");
+        when(refreshService.createRefreshToken(any())).thenReturn(refresh);
+        when(repo.findById(any())).thenReturn(Optional.of(new User()));
 
         AuthRequest request = new AuthRequest("ethan", "password");
-        AuthResponse response = service.login(request);
+        LoginResult result = service.login(request);
 
-        assertEquals( "token", response.accessToken());
+        assertEquals( "token", result.authResponse().accessToken());
+        assertEquals(refreshID.toString(), result.refreshToken());
     }
 
     @Test

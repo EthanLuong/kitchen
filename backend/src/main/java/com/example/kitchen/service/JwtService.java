@@ -44,7 +44,7 @@ public class JwtService {
                     .parseSignedClaims(retrieveJWT(request)).getPayload().getSubject();
             return subject;
         } catch (JwtException e) {
-            log.error("JWT verification failed: {}", e.getMessage());
+            log.warn("JWT verification failed: {}", e.getMessage());
         }
         return null;
     }
