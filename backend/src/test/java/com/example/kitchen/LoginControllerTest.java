@@ -6,6 +6,7 @@ import com.example.kitchen.configuration.SecurityConfig;
 import com.example.kitchen.controller.LoginController;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
+import com.example.kitchen.dto.LoginResult;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.service.JwtService;
 import com.example.kitchen.service.LoginService;
@@ -21,6 +22,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.client.RestTestClient;
+
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -78,7 +81,7 @@ public class LoginControllerTest {
 
     @Test
     public void login_happy_returnsToken() {
-        when(loginService.login(any())).thenReturn(new AuthResponse("token", "Bearer", 60, "refresh"));
+        when(loginService.login(any())).thenReturn(new LoginResult(new AuthResponse("token", "Bearer", 60), "refreshToken"));
 
         client.post()
                 .uri("/v1/auth/login")

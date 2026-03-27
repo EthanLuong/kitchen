@@ -4,7 +4,7 @@ import com.example.kitchen.data.RefreshToken;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
-import com.example.kitchen.dto.RefreshRequest;
+import com.example.kitchen.dto.LoginResult;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -41,14 +41,16 @@ public class LoginService {
     }
 
     @Transactional
-    public AuthResponse login(AuthRequest request) {
+    public LoginResult login(AuthRequest request) {
         log.info("Attempting sign in for user with username {}", request.username());
         Authentication authentication = auth.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         RefreshToken token = refreshService.createRefreshToken(repo.findById(UUID.fromString(authentication.getName())).orElseThrow());
 
-        return new AuthResponse(
-                jwtService.createJWT(authentication.getName()), "Bearer", expirationTime, token.getToken().toString());
+        AuthResponse response =  new AuthResponse(
+                jwtService.createJWT(authentication.getName()), "Bearer", expirationTime);
+
+        return new LoginResult(response, token.getToken().toString());
     }
 
     @Transactional
@@ -64,10 +66,10 @@ public class LoginService {
         repo.save(user);
     }
 
-    public AuthResponse refreshAccess(RefreshRequest refreshToken){
-        RefreshToken token = refreshService.validateToken(refreshToken.refreshToken());
+    public AuthResponse refreshAccess(String refreshToken){
+        RefreshToken token = refreshService.validateToken(UUID.fromString(refreshToken));
         String jwtToken = jwtService.createJWT(token.getUser().getUserid().toString());
-        return new AuthResponse(jwtToken, "Bearer", expirationTime, refreshToken.refreshToken().toString());
+        return new AuthResponse(jwtToken, "Bearer", expirationTime);
     }
 
 

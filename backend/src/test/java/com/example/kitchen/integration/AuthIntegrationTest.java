@@ -141,20 +141,18 @@ public class AuthIntegrationTest {
     }
     @Test
     void refresh_validToken_returnsNewAccessToken() {
-        RefreshRequest request = new RefreshRequest(tokenId);
-        restClient.post().uri("/v1/auth/refresh").body(request).exchange().expectBody(AuthResponse.class);
+        restClient.post().uri("/v1/auth/refresh").cookie("refreshToken", tokenId.toString()).exchange().expectBody(AuthResponse.class);
     }
 
     @Test
     void refresh_invalidToken_returns401() {
         RefreshRequest request = new RefreshRequest(UUID.randomUUID());
-        restClient.post().uri("/v1/auth/refresh").body(request).exchange().expectStatus().isUnauthorized();
+        restClient.post().uri("/v1/auth/refresh").cookie("refreshToken", UUID.randomUUID().toString()).exchange().expectStatus().isUnauthorized();
     }
 
     @Test
     void refresh_expiredToken_returns401() {
-        RefreshRequest request = new RefreshRequest(expiredId);
-        restClient.post().uri("/v1/auth/refresh").body(request).exchange().expectStatus().isUnauthorized();
+        restClient.post().uri("/v1/auth/refresh").cookie("refreshToken", expiredId.toString()).exchange().expectStatus().isUnauthorized();
     }
 
     @Test

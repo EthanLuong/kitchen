@@ -4,6 +4,7 @@ import com.example.kitchen.data.RefreshToken;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
+import com.example.kitchen.dto.LoginResult;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import com.example.kitchen.service.JwtService;
@@ -60,10 +61,10 @@ public class LoginServiceTest {
         when(repo.findById(any())).thenReturn(Optional.of(new User()));
 
         AuthRequest request = new AuthRequest("ethan", "password");
-        AuthResponse response = service.login(request);
+        LoginResult result = service.login(request);
 
-        assertEquals( "token", response.accessToken());
-        assertEquals(refreshID.toString(), response.refreshToken());
+        assertEquals( "token", result.authResponse().accessToken());
+        assertEquals(refreshID.toString(), result.refreshToken());
     }
 
     @Test
