@@ -33,7 +33,6 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         log.info("Checking JWT Authorization...");
-        System.out.println("test");
         String subject = jwtService.getSubject(request);
         if (subject != null) {
             log.info("JWT valid for user with UUID: {}", subject);

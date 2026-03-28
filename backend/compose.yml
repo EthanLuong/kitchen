@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_URL=jdbc:postgresql://db:5432/kitchen
+      - ALLOWED_ORIGIN=${ALLOWED_ORIGIN}
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+
+  db:
+    image: postgres:16
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=kitchen
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 30s
+    env_file: .env
+
+
+volumes:
+  db-data:
