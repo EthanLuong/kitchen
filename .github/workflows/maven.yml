@@ -33,3 +33,5 @@ jobs:
         JWT_SECRET: ${{secrets.JWT_SECRET}}
         ALLOWED_ORIGIN: http://localhost:5173
         DB_URL: jdbc:postgresql://localhost:5432/kitchen
+        DB_PASSWORD: password
+        DB_USERNAME: postgres
