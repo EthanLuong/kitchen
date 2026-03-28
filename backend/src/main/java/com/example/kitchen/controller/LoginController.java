@@ -8,6 +8,7 @@ import com.example.kitchen.service.LoginService;
 import com.example.kitchen.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -24,6 +25,9 @@ public class LoginController {
 
     private final LoginService loginService;
 
+    @Value("${cookie.secure}")
+    private boolean cookeSecure;
+
     public LoginController(LoginService service) {
         this.loginService = service;
     }
@@ -33,7 +37,7 @@ public class LoginController {
         LoginResult result = loginService.login(request);
         ResponseCookie cookie = ResponseCookie.from("refreshToken", result.refreshToken())
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookeSecure)
                 .path("/v1/auth/refresh")
                 .sameSite("None")
                 .maxAge(Duration.ofHours(8))
@@ -57,7 +61,7 @@ public class LoginController {
         loginService.logout(userid(principal));
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(cookeSecure)
                 .path("/v1/auth/refresh")
                 .sameSite("None")
                 .maxAge(0)
