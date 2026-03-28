@@ -33,7 +33,7 @@ public class JwtService {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(Date.from(Instant.now().plus(expirationTime, ChronoUnit.SECONDS)))
+                .expiration(Date.from(Instant.now().plusSeconds(expirationTime)))
                 .signWith(getKey())
                 .compact();
     }

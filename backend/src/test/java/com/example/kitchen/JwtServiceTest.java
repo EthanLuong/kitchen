@@ -28,6 +28,8 @@ public class JwtServiceTest {
     public void setup(){
         jwtService = new JwtService();
         ReflectionTestUtils.setField(jwtService, "secret", "MMHLMQG7ERhS25dJE089lOAbujWeSvHPcjPw1yX9SBl");
+        ReflectionTestUtils.setField(jwtService, "expirationTime", 900);
+
     }
 
     @Test
