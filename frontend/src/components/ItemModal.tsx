@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { UNIT, TYPE, LOCATIONS, type FoodItemRequest } from "../types/types";
 type ItemModalProps = {
   initialValue: FoodItemRequest | null | "add";
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormData) => Promise<void>;
   setIsOpen: (state: null) => void;
 };
 
@@ -10,6 +11,9 @@ export default function ItemModal({
   onSubmit,
   setIsOpen,
 }: ItemModalProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [itemError, setError] = useState<null | string>(null);
+
   if (!initialValue) return null;
 
   const defaultValues: FoodItemRequest =
@@ -27,10 +31,19 @@ export default function ItemModal({
         }
       : initialValue;
 
-  function handleSubmit(event: React.SubmitEvent) {
+  async function handleSubmit(event: React.SubmitEvent) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-    onSubmit(formData);
+    try {
+      setIsLoading(true);
+      setError(null);
+      await onSubmit(formData);
+      setIsOpen(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Submit request failed");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -90,13 +103,23 @@ export default function ItemModal({
             ></input>
           </div>
 
-          <button className="modal-submit" type="submit">
-            {initialValue != null && initialValue != "add"
-              ? "Edit Item"
-              : "Add Item"}
+          <button className="modal-submit" type="submit" disabled={isLoading}>
+            {isLoading
+              ? "Saving..."
+              : initialValue != null && initialValue != "add"
+                ? "Edit Item"
+                : "Add Item"}
           </button>
         </form>
-        <button className="modal-close" onClick={() => setIsOpen(null)}>
+        {itemError && <p className="form-error">{itemError}</p>}
+
+        <button
+          className="modal-close"
+          onClick={() => {
+            setIsOpen(null);
+            setError(null);
+          }}
+        >
           Exit
         </button>
       </div>

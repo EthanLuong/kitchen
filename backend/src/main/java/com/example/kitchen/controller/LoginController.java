@@ -8,6 +8,7 @@ import com.example.kitchen.service.LoginService;
 import com.example.kitchen.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import java.security.Principal;
 import java.time.Duration;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/v1/auth")
 public class LoginController {
@@ -27,6 +29,8 @@ public class LoginController {
 
     @Value("${cookie.secure}")
     private boolean cookeSecure;
+    @Value("${cookie.same-site}")
+    private String cookieSameSite;
 
     public LoginController(LoginService service) {
         this.loginService = service;
@@ -35,11 +39,12 @@ public class LoginController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         LoginResult result = loginService.login(request);
+        log.info("Cookie secure: {}, CookieSameSite: {}", cookeSecure, cookieSameSite);
         ResponseCookie cookie = ResponseCookie.from("refreshToken", result.refreshToken())
                 .httpOnly(true)
                 .secure(cookeSecure)
                 .path("/v1/auth/refresh")
-                .sameSite("None")
+                .sameSite(cookieSameSite)
                 .maxAge(Duration.ofHours(8))
                 .build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(result.authResponse());
@@ -63,7 +68,7 @@ public class LoginController {
                 .httpOnly(true)
                 .secure(cookeSecure)
                 .path("/v1/auth/refresh")
-                .sameSite("None")
+                .sameSite(cookieSameSite)
                 .maxAge(0)
                 .build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
