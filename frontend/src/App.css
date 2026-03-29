@@ -1,9 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500&family=Source+Sans+3:wght@200;500&display=swap");
 
-#root {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
+:root {
   text-align: center;
   font-family: "Lora", Georgia, serif;
   --tc: #a84b25; /* terracotta — primary accent, top band, buttons */
@@ -20,49 +17,216 @@
   --mid: #7a5244; /* secondary text — labels, hints, placeholder */
 
   --sand: #c8b49a; /* borders — inputs, buttons, dividers */
-  --sand-lt: #ede5d4; /* subtle borders — card edges, divider lines */
+  --sand-lt: #dacdb3; /* subtle borders — card edges, divider lines */
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  width: 100%;
+
+  background-color: var(--cream);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--ink);
+  margin: 0;
 }
 button {
   padding: 0.5rem 1rem;
   border-radius: 24px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--sand);
+  color: var(--ink);
+  background-color: transparent;
   font-family: "Source Sans 3", sans-serif;
-  margin: 0 0.5rem;
-}
-body {
-  background-color: #f4eee1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin: 0;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
+button:hover {
+  background-color: var(--sand-lt);
+  border-color: var(--sand);
+}
 .foodlist {
   margin: 0 auto;
   display: grid;
   width: 80%;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 5rem;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
 }
 
 .foodcard {
   font-family: "Source Sans 3", sans-serif;
-  overflow: hidden;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* replaces justify-content: space-around */
+  background-color: var(--card);
+  text-align: start;
+  padding: 1.5rem;
+  border: 1px solid var(--sand-lt); /* subtle border, sand was too heavy */
+  border-radius: 16px;
+  color: var(--ink);
+  position: relative;
+}
+
+.foodcard:hover {
+  border-color: var(--sand); /* border darkens slightly on hover */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.badges {
   display: flex;
   width: 100%;
-  background-color: #fdfaf4;
-  text-align: start;
-  align-items: start;
-  justify-content: space-around;
-  flex-direction: column;
-  padding: 2rem;
-  border: 1px solid #ccc;
-  border-radius: 16px;
+  gap: 0.5rem;
+  padding: 0; /* removed, gap handles spacing now */
+  padding-bottom: 0.75rem;
+
+  border-bottom: 1px solid var(--sand-lt); /* visual separator between content and actions */
 }
+
+.badges p {
+  background-color: var(--tc-pale);
+  color: var(--tc);
+  padding: 0.25rem 0.75rem;
+  border-radius: 24px;
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1rem;
+  text-transform: uppercase;
+}
+.cardfooter {
+  width: 100%; /* was 80%, inconsistent with rest of card */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--sand-lt); /* visual separator between content and actions */
+  margin-top: auto; /* pushes footer to bottom if cards have different heights */
+}
+
 .iteminfo {
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: baseline; /* aligns name and quantity on text baseline */
 }
+
+.itemName {
+  font-size: 1.5rem; /* 3rem was very large */
+  font-family: "Lora", serif; /* Lora for headings, Source Sans for body */
+  margin: 0;
+  word-break: break-word;
+}
+
+.quantity {
+  font-size: 0.9rem;
+  color: var(--mid);
+  margin: 0;
+  white-space: nowrap; /* prevents "500 g" from wrapping */
+}
+
+.number {
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.expdate {
+  font-size: 0.85rem;
+  color: var(--mid);
+  margin: 0;
+  font-family: "Source Sans 3", sans-serif;
+  font-weight: 400;
+}
+
+.deleteitem {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--mid);
+  font-size: 1rem;
+  padding: 0.25rem;
+  margin: 0;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.deleteitem:hover {
+  color: #b94040;
+}
+
+.filterbar {
+  width: 80%;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterrow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* buttons wrap to next line on small screens */
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 0.9rem;
+}
+
+.filterrow span {
+  width: 80px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08rem;
+  text-transform: uppercase;
+  color: var(--mid);
+  flex-shrink: 0; /* prevents label from squishing */
+}
+
+.filterrow select {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--sand);
+  border-radius: 24px;
+  background-color: transparent;
+  color: var(--ink);
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.filterrow button {
+  background-color: var(--card);
+}
+
+.filterrow button:hover {
+  background-color: var(--sand-lt);
+  border-color: var(--sand);
+}
+
+.filterrow button.selected {
+  background-color: var(--tc);
+  color: white; /* text was invisible without this */
+  border-color: var(--tc);
+}
+
+.filterrow button.selected:hover {
+  background-color: var(--tc-light);
+  border-color: var(--tc-light);
+}
+.buttoncard {
+  border-style: dashed;
+}
+
 .overlay {
   position: fixed;
   inset: 0;
@@ -76,98 +240,160 @@ body {
 .login {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: var(--card);
   padding-left: 1rem;
   padding-top: 0.25rem;
 }
 
-.badges {
-  display: flex;
+.modalcard {
   width: 100%;
-  font-size: 0.5rem;
-  letter-spacing: 0.15rem;
-  font-weight: 200;
-  margin: 0 auto;
-  padding: 0.5rem 0;
-  justify-content: space-between;
+  max-width: 480px;
+  border-radius: 16px;
+  border: 1px solid var(--sand-lt);
+  position: relative;
+  background-color: var(--card);
+  padding: 3rem 2rem 2rem 2rem;
 }
 
-.badges h1 {
-  background-color: gray;
-  padding: 0.5rem 1rem;
-  border-radius: 24px;
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: var(--mid);
   margin: 0;
 }
 
-.cardfooter {
-  width: 80%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+.modal-close:hover {
+  color: var(--ink);
 }
 
-.itemName {
-  font-size: 3rem;
-  margin: 0.5rem 0;
-}
-.quantity {
-  margin: 0.5rem 0;
-}
-
-.number {
-  font-size: 3rem;
-}
-
-.filterbar {
-  width: 80%;
-  margin: 2rem auto;
-}
-
-.filterrow {
-  font-size: 2rem;
-  display: flex;
-
-  padding: 0.5rem 0;
-  align-items: center;
-  text-align: left;
-}
-.filterrow span {
-  width: 150px;
-}
-
-.buttoncard {
-  border-style: dashed;
-}
-
-.modalcard {
-  display: flex;
-  flex-direction: column;
-  background-color: var(--card);
-  padding: 2rem;
-  margin: 1rem;
-  position: relative;
-}
-
-.modalcard form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
+.modalform {
+  display: flex; /* ← missing */
+  flex-direction: column; /* ← missing */
+  width: 100%;
+  gap: 0.5rem;
 }
 
 .formitem {
-  padding: 1rem;
-  width: 100;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0;
 }
 
-.formitem input {
-  border-style: solid;
+.formitem label {
+  font-size: 0.85rem;
+  color: var(--mid);
+  font-family: "Source Sans 3", sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+.formitem input,
+.formitem select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--sand);
   border-radius: 8px;
-  padding: 0.25rem;
-  margin: 0 0.25rem;
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 1rem;
 }
 
-.selected {
-  background-color: gray;
+.formitem input:focus,
+.formitem select:focus {
+  outline: none;
+  border-color: var(--tc-light);
+}
+
+.modal-submit {
+  width: 100%;
+  margin: 1rem 0 0 0;
+  background-color: var(--tc);
+  color: white;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-submit:hover {
+  background-color: var(--tc-light);
+}
+
+.authcard {
+  background-color: var(--card);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--sand-lt);
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.auth-title {
+  font-family: "Lora", serif;
+  color: var(--ink);
+  font-size: 1.75rem;
+  margin: 0;
+  text-align: center;
+}
+
+.authform {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auth-submit {
+  width: 100%;
+  margin: 0.5rem 0 0 0;
+  background-color: var(--sage);
+  color: white;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.auth-submit:hover {
+  background-color: var(--sage-pale);
+  color: var(--sage);
+}
+
+.navbar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 10%;
+
+  background-color: var(--tc);
+  margin-bottom: 1rem;
+}
+
+.navbar-title {
+  font-family: "Lora", serif;
+  color: white;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.navbar-actions button {
+  background-color: transparent;
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.navbar-actions button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: white;
 }
