@@ -54,3 +54,13 @@ export type FoodItemResponse = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export type Page<T> = {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  number: number; // current page (0-indexed)
+  size: number;
+  first: boolean;
+  last: boolean;
+};

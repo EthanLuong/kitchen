@@ -2,14 +2,16 @@ import {
   type FoodItemRequest,
   type FoodItemResponse,
   type Token,
+  type Page,
 } from "../types/types";
 
 const BASE_URL = "http://localhost:8080/v1";
 
 export async function getAllFoodItems(
   token: Token,
-): Promise<FoodItemResponse[]> {
-  const response = await fetch(`${BASE_URL}/items`, {
+  page: string = "",
+): Promise<Page<FoodItemResponse>> {
+  const response = await fetch(`${BASE_URL}/items${page}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -104,5 +106,18 @@ export async function createNewUser(
 
   if (!response.ok) {
     throw new Error("Failed to create user");
+  }
+}
+
+export async function logoutUser(token: Token): Promise<void> {
+  const response = await fetch(`${BASE_URL}/auth/logout`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to Logout user");
   }
 }

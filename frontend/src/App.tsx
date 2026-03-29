@@ -5,12 +5,14 @@ import {
   type FoodType,
   type FoodItemRequest,
   type SortOptions,
+  type Page,
 } from "./types/types";
 import {
   getAllFoodItems,
   deleteFoodItem,
   createNewFoodItem,
   updateFoodItem,
+  logoutUser,
 } from "./api/fetchFood";
 import ItemModal from "./components/ItemModal";
 import AuthenticationModal from "./components/AuthCard";
@@ -47,7 +49,7 @@ function App() {
       try {
         setFoodLoading(true);
         const response = await getAllFoodItems(authToken as string);
-        setFoodList(response);
+        setFoodList(response.content);
       } catch (err) {
         setFoodError(true);
         setToken(null);
@@ -82,6 +84,16 @@ function App() {
       );
       setFoodList((prev) => [...prev, response]);
       setModalState(null);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function handleLogout() {
+    if (!authToken) return;
+    try {
+      logoutUser(authToken);
+      setToken(null);
     } catch (err) {
       console.log(err);
     }
@@ -152,7 +164,6 @@ function App() {
     )
     .filter((item) => typeFilter.size === 0 || typeFilter.has(item.foodType))
     .sort(sortCards);
-
   const initialForm =
     modalState !== "add" && modalState != null
       ? responseToFoodItemRequest(modalState)
@@ -181,6 +192,7 @@ function App() {
         onDelete={handleDeleteFoodItem}
         onEdit={setModalState}
       />{" "}
+      <button onClick={handleLogout}>logout</button>
     </>
   );
 }

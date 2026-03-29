@@ -9,8 +9,8 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
   return (
     <div className="foodcard">
       <div className="badges">
-        <h1>{item.location}</h1>
-        <h1>{item.foodType}</h1>
+        <p>{item.location}</p>
+        <p>{item.foodType}</p>
       </div>
       <div className="iteminfo">
         <h1 className="itemName">{item.name}</h1>

@@ -30,15 +30,22 @@ export default function AuthenticationModal({
 
   return (
     <div className="overlay">
-      <form onSubmit={handleSubmit} className="login">
-        <div>
-          Username: <input type="text" name="username"></input>
-        </div>
-        <div>
-          Password: <input type="password" name="password"></input>
-        </div>
-        <button type="submit">Login</button>
-      </form>
+      <div className="authcard">
+        <h2 className="auth-title">Kitchen</h2>
+        <form onSubmit={handleSubmit} className="authform">
+          <div className="formitem">
+            <label>Username</label>
+            <input type="text" name="username" />
+          </div>
+          <div className="formitem">
+            <label>Password</label>
+            <input type="password" name="password" />
+          </div>
+          <button className="auth-submit" type="submit">
+            Login
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
