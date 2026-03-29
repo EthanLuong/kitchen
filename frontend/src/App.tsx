@@ -5,7 +5,6 @@ import {
   type FoodType,
   type FoodItemRequest,
   type SortOptions,
-  type Page,
 } from "./types/types";
 import {
   getAllFoodItems,
