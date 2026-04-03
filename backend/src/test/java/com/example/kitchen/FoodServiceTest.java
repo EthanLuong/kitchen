@@ -3,9 +3,12 @@ package com.example.kitchen;
 import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
+import com.example.kitchen.dto.UserLocationResponse;
+import com.example.kitchen.dto.UserTypeResponse;
 import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
 import com.example.kitchen.service.FoodItemService;
+import com.example.kitchen.service.UserPreferencesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +39,8 @@ public class FoodServiceTest {
     private FoodItemRepository foodRepo;
     @Mock
     private UserRepository userRepo;
+    @Mock
+    private UserPreferencesService userPreferencesService;
 
     @InjectMocks
     FoodItemService service;
@@ -145,6 +150,14 @@ public class FoodServiceTest {
 
     @Test
     public void addItem_success() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
+
         User user = makeUser(USER_ID);
         FoodItem saved = makeItem(user);
         FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
@@ -158,6 +171,14 @@ public class FoodServiceTest {
 
     @Test
     public void addItem_userNotFound_throws404() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
+
         FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
                 "FRIDGE", null, null, null, null);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.empty());
@@ -168,6 +189,14 @@ public class FoodServiceTest {
 
     @Test
     public void updateItem_success() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
+
         User user = makeUser(USER_ID);
         FoodItem existing = makeItem(user);
         FoodItem updated = makeItem(user);
@@ -182,6 +211,13 @@ public class FoodServiceTest {
 
     @Test
     public void updateItem_notFound_throws404() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
         FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
                 "FRIDGE", null, null, null, null);
         when(foodRepo.findById(1L)).thenReturn(Optional.empty());
@@ -190,6 +226,13 @@ public class FoodServiceTest {
 
     @Test
     public void updateItem_wrongOwner_throws403() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
         User owner = makeUser(USER_ID);
         FoodItem item = makeItem(owner);
         FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,

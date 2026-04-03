@@ -3,10 +3,15 @@ package com.example.kitchen.integration;
 
 import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.data.User;
+import com.example.kitchen.data.UserLocations;
+import com.example.kitchen.data.UserTypes;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.repository.FoodItemRepository;
+import com.example.kitchen.repository.UserLocationRepository;
 import com.example.kitchen.repository.UserRepository;
+import com.example.kitchen.repository.UserTypeRepository;
 import com.example.kitchen.service.JwtService;
+import com.example.kitchen.service.UserPreferencesService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +48,12 @@ public class FoodIntegrationTest {
     @Autowired
     private UserRepository userRepo;
 
+    @Autowired
+    private UserLocationRepository locationRepo;
+
+    @Autowired
+    private UserTypeRepository typeRepo;
+
     private RestTestClient restClient;
 
     @Autowired
@@ -72,8 +83,24 @@ public class FoodIntegrationTest {
         restClient = RestTestClient.bindTo(mockMvc).build();
         foodRepo.deleteAll();
         userRepo.deleteAll();
+        locationRepo.deleteAll();
+        typeRepo.deleteAll();
         User newUser = new User(null, "ethan", encoder.encode("strongpassword"), true, null);
         User savedUser = userRepo.save(newUser);
+
+        UserTypes type = new UserTypes();
+        UserLocations location = new UserLocations();
+        type.setName("PRODUCE");
+        location.setName("COUNTER");
+        type.setUser(savedUser);
+        location.setUser(savedUser);
+
+        typeRepo.save(type);
+        locationRepo.save(location);
+
+
+
+
         FoodItem item = new FoodItem();
         item.setUser(savedUser);
         item.setName("banana");

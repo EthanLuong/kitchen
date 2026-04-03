@@ -87,10 +87,11 @@ public class FoodItemService {
     // ── Update ─────────────────────────────────────────────────
     @Transactional
     public FoodItemResponse updateItem(UUID userId, Long id, FoodItemRequest request) {
-        validatePreferences(userId, request);
         log.info("Updating item with id {} for user with UUID {}", id, userId);
         FoodItem existing = findOwnedItem(userId, id);
         applyRequest(existing, request);
+        validatePreferences(userId, request);
+
         return FoodItemResponse.from(foodRepo.save(existing));
     }
     
