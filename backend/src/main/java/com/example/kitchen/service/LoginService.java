@@ -5,10 +5,12 @@ import com.example.kitchen.data.User;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.dto.LoginResult;
+import com.example.kitchen.event.UserCreatedEvent;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,17 +29,19 @@ public class LoginService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${jwt.expiration}")
     private int expirationTime;
 
     public LoginService(AuthenticationManager auth, UserRepository repo,
-                        PasswordEncoder encoder, JwtService jwtService, RefreshTokenService refreshService) {
+                        PasswordEncoder encoder, JwtService jwtService, RefreshTokenService refreshService, ApplicationEventPublisher eventPublisher) {
         this.auth = auth;
         this.repo = repo;
         this.encoder = encoder;
         this.jwtService = jwtService;
         this.refreshService = refreshService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -56,14 +60,22 @@ public class LoginService {
     @Transactional
     public void signup(AuthRequest request) {
         log.info("Attempting to create new user with username {}", request.username());
+
         User existingUser = repo.findByUsername(request.username());
         if (existingUser != null) {
             throw new UserAlreadyExistsException();
         }
+
         User user = new User();
+
         user.setUsername(request.username());
         user.setPassword(encoder.encode(request.password()));
-        repo.save(user);
+
+        User createdUser = repo.save(user);
+
+        UserCreatedEvent newUserEvent = new UserCreatedEvent(this, createdUser.getUserid());
+
+        eventPublisher.publishEvent(newUserEvent);
     }
 
     public AuthResponse refreshAccess(String refreshToken){

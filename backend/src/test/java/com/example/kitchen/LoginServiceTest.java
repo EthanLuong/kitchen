@@ -5,6 +5,7 @@ import com.example.kitchen.data.User;
 import com.example.kitchen.dto.AuthRequest;
 import com.example.kitchen.dto.AuthResponse;
 import com.example.kitchen.dto.LoginResult;
+import com.example.kitchen.event.UserCreatedEvent;
 import com.example.kitchen.exception.UserAlreadyExistsException;
 import com.example.kitchen.repository.UserRepository;
 import com.example.kitchen.service.JwtService;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,6 +46,9 @@ public class LoginServiceTest {
     private  JwtService jwtService;
     @Mock
     private RefreshTokenService refreshService;
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
 
 
     @InjectMocks
@@ -77,12 +82,23 @@ public class LoginServiceTest {
 
     @Test
     public void signup_success(){
+        User newUser = new User();
+        UUID userId = UUID.randomUUID();
+        newUser.setUserid(userId);
+
         when(repo.findByUsername(any())).thenReturn(null);
         when(encoder.encode(any())).thenReturn("encoded");
+        when(repo.save(any())).thenReturn(newUser);
+
         AuthRequest request = new AuthRequest("ethan", "password");
         service.signup(request);
-        verify(repo).save(argThat(user->user.getUsername().equals("ethan") && user.getPassword().equals("encoded")));
 
+        verify(repo).save(argThat(user ->
+                user.getUsername().equals("ethan") && user.getPassword().equals("encoded")));
+
+        verify(eventPublisher).publishEvent(argThat(event ->
+                event instanceof UserCreatedEvent &&
+                        ((UserCreatedEvent) event).getUserId().equals(userId)));
 
     }
 

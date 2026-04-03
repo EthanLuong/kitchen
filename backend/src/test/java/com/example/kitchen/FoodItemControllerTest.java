@@ -54,8 +54,8 @@ public class FoodItemControllerTest {
     private static final UUID USER_ID = UUID.randomUUID();
 
     private static final FoodItemResponse SAMPLE_RESPONSE = new FoodItemResponse(
-            1L, "Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-            FoodItem.Location.FRIDGE, LocalDate.now().plusDays(7), null, null, null,
+            1L, "Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+            "FRIDGE", LocalDate.now().plusDays(7), null, null, null,
             false, null, null
     );
 
@@ -109,7 +109,7 @@ public class FoodItemControllerTest {
 
     @Test
     public void getByLocation_happy_returnsOk() {
-        when(service.getByLocation(any(), eq(FoodItem.Location.FRIDGE))).thenReturn(List.of(SAMPLE_RESPONSE));
+        when(service.getByLocation(any(), eq("FRIDGE"))).thenReturn(List.of(SAMPLE_RESPONSE));
         client.get().uri("/v1/items/location/FRIDGE")
                 .header("Authorization", "Bearer fake")
                 .exchange()
@@ -118,17 +118,11 @@ public class FoodItemControllerTest {
                 .jsonPath("$[0].location").isEqualTo("FRIDGE");
     }
 
-    @Test
-    public void getByLocation_invalidEnum_returns400() {
-        client.get().uri("/v1/items/location/GARAGE")
-                .header("Authorization", "Bearer fake")
-                .exchange()
-                .expectStatus().isBadRequest();
-    }
+
 
     @Test
     public void getByType_happy_returnsOk() {
-        when(service.getByFoodType(any(), eq(FoodItem.FoodType.DAIRY))).thenReturn(List.of(SAMPLE_RESPONSE));
+        when(service.getByFoodType(any(), eq("DAIRY"))).thenReturn(List.of(SAMPLE_RESPONSE));
         client.get().uri("/v1/items/type/DAIRY")
                 .header("Authorization", "Bearer fake")
                 .exchange()
@@ -137,13 +131,7 @@ public class FoodItemControllerTest {
                 .jsonPath("$[0].foodType").isEqualTo("DAIRY");
     }
 
-    @Test
-    public void getByType_invalidEnum_returns400() {
-        client.get().uri("/v1/items/type/CANDY")
-                .header("Authorization", "Bearer fake")
-                .exchange()
-                .expectStatus().isBadRequest();
-    }
+
 
     @Test
     public void create_happy_returns201() {
@@ -151,8 +139,8 @@ public class FoodItemControllerTest {
         client.post().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0,
-                        FoodItem.Unit.L, FoodItem.Location.FRIDGE, null, null, null, null))
+                .body(new FoodItemRequest("Milk", "DAIRY", 1.0,
+                        FoodItem.Unit.L, "FRIDGE", null, null, null, null))
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody()
@@ -164,8 +152,8 @@ public class FoodItemControllerTest {
         client.post().uri("/v1/items")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new FoodItemRequest("", FoodItem.FoodType.DAIRY, 1.0,
-                        FoodItem.Unit.L, FoodItem.Location.FRIDGE, null, null, null, null))
+                .body(new FoodItemRequest("", "DAIRY", 1.0,
+                        FoodItem.Unit.L, "FRIDGE", null, null, null, null))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -176,7 +164,7 @@ public class FoodItemControllerTest {
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new FoodItemRequest("Milk", null, 1.0,
-                        FoodItem.Unit.L, FoodItem.Location.FRIDGE, null, null, null, null))
+                        FoodItem.Unit.L, "FRIDGE", null, null, null, null))
                 .exchange()
                 .expectStatus().isBadRequest();
     }
@@ -184,14 +172,14 @@ public class FoodItemControllerTest {
     @Test
     public void update_happy_returnsOk() {
         FoodItemResponse updated = new FoodItemResponse(
-                1L, "Oat Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, null, null, null, null, false, null, null);
+                1L, "Oat Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", null, null, null, null, false, null, null);
         when(service.updateItem(any(), eq(1L), any())).thenReturn(updated);
         client.put().uri("/v1/items/1")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new FoodItemRequest("Oat Milk", FoodItem.FoodType.DAIRY, 1.0,
-                        FoodItem.Unit.L, FoodItem.Location.FRIDGE, null, null, null, null))
+                .body(new FoodItemRequest("Oat Milk", "DAIRY", 1.0,
+                        FoodItem.Unit.L, "FRIDGE", null, null, null, null))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -205,8 +193,8 @@ public class FoodItemControllerTest {
         client.put().uri("/v1/items/99")
                 .header("Authorization", "Bearer fake")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0,
-                        FoodItem.Unit.L, FoodItem.Location.FRIDGE, null, null, null, null))
+                .body(new FoodItemRequest("Milk", "DAIRY", 1.0,
+                        FoodItem.Unit.L, "FRIDGE", null, null, null, null))
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -224,8 +212,8 @@ public class FoodItemControllerTest {
     @Test
     public void consume_happy_returnsOk() {
         FoodItemResponse consumed = new FoodItemResponse(
-                1L, "Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, null, null, null, null, true, null, null);
+                1L, "Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", null, null, null, null, true, null, null);
         when(service.markConsumed(any(), eq(1L))).thenReturn(consumed);
         client.patch().uri("/v1/items/1/consume")
                 .header("Authorization", "Bearer fake")

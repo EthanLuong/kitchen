@@ -1,6 +1,7 @@
 package com.example.kitchen.exception;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -42,6 +43,16 @@ public class GlobalExceptionHandler {
         response.setTitle("Invalid arguments");
         log.warn("Argument validation failed: {}", details);
         return response;
+    }
+
+    @ExceptionHandler(ResourceOwnershipException.class)
+    public ProblemDetail handleInvalidOwner(ResourceOwnershipException ex){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ProblemDetail handleDataViolation(DataIntegrityViolationException ex){
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(ResponseStatusException.class)

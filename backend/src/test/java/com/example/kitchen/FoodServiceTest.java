@@ -3,9 +3,12 @@ package com.example.kitchen;
 import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
+import com.example.kitchen.dto.UserLocationResponse;
+import com.example.kitchen.dto.UserTypeResponse;
 import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
 import com.example.kitchen.service.FoodItemService;
+import com.example.kitchen.service.UserPreferencesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +39,8 @@ public class FoodServiceTest {
     private FoodItemRepository foodRepo;
     @Mock
     private UserRepository userRepo;
+    @Mock
+    private UserPreferencesService userPreferencesService;
 
     @InjectMocks
     FoodItemService service;
@@ -56,10 +61,10 @@ public class FoodServiceTest {
         item.setId(1L);
         item.setUser(owner);
         item.setName("Milk");
-        item.setFoodType(FoodItem.FoodType.DAIRY);
+        item.setFoodType("DAIRY");
         item.setQuantity(1.0);
         item.setUnit(FoodItem.Unit.L);
-        item.setLocation(FoodItem.Location.FRIDGE);
+        item.setLocation("FRIDGE");
         item.setExpirationDate(LocalDate.now().plusDays(7));
         return item;
     }
@@ -125,7 +130,7 @@ public class FoodServiceTest {
     public void getByLocation_returnsList() {
         FoodItem item = makeItem(makeUser(USER_ID));
         when(foodRepo.findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(any(), any())).thenReturn(List.of(item));
-        List<FoodItemResponse> result = service.getByLocation(USER_ID, FoodItem.Location.FRIDGE);
+        List<FoodItemResponse> result = service.getByLocation(USER_ID, "FRIDGE");
         assertEquals(1, result.size());
         assertEquals(item.getId(), result.get(0).id());
     }
@@ -136,7 +141,7 @@ public class FoodServiceTest {
     public void getByFoodType_returnsList() {
         FoodItem item = makeItem(makeUser(USER_ID));
         when(foodRepo.findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(any(), any())).thenReturn(List.of(item));
-        List<FoodItemResponse> result = service.getByFoodType(USER_ID, FoodItem.FoodType.DAIRY);
+        List<FoodItemResponse> result = service.getByFoodType(USER_ID, "DAIRY");
         assertEquals(1, result.size());
         assertEquals(item.getId(), result.get(0).id());
     }
@@ -145,10 +150,18 @@ public class FoodServiceTest {
 
     @Test
     public void addItem_success() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
+
         User user = makeUser(USER_ID);
         FoodItem saved = makeItem(user);
-        FoodItemRequest request = new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, LocalDate.now().plusDays(7), null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", LocalDate.now().plusDays(7), null, null, null);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.of(user));
         when(foodRepo.save(any())).thenReturn(saved);
         FoodItemResponse response = service.addItem(USER_ID, request);
@@ -158,8 +171,16 @@ public class FoodServiceTest {
 
     @Test
     public void addItem_userNotFound_throws404() {
-        FoodItemRequest request = new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, null, null, null, null);
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
+
+        FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", null, null, null, null);
         when(userRepo.findById(USER_ID)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class, () -> service.addItem(USER_ID, request));
     }
@@ -168,12 +189,20 @@ public class FoodServiceTest {
 
     @Test
     public void updateItem_success() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
+        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
+
         User user = makeUser(USER_ID);
         FoodItem existing = makeItem(user);
         FoodItem updated = makeItem(user);
         updated.setName("Oat Milk");
-        FoodItemRequest request = new FoodItemRequest("Oat Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, LocalDate.now().plusDays(7), null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Oat Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", LocalDate.now().plusDays(7), null, null, null);
         when(foodRepo.findById(1L)).thenReturn(Optional.of(existing));
         when(foodRepo.save(any())).thenReturn(updated);
         FoodItemResponse response = service.updateItem(USER_ID, 1L, request);
@@ -182,18 +211,28 @@ public class FoodServiceTest {
 
     @Test
     public void updateItem_notFound_throws404() {
-        FoodItemRequest request = new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, null, null, null, null);
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
+        FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", null, null, null, null);
         when(foodRepo.findById(1L)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class, () -> service.updateItem(USER_ID, 1L, request));
     }
 
     @Test
     public void updateItem_wrongOwner_throws403() {
+        List<UserTypeResponse> types = new ArrayList<>();
+        List<UserLocationResponse> locations = new ArrayList<>();
+        types.add(new UserTypeResponse(1L, "DAIRY"));
+        locations.add(new UserLocationResponse(1L, "FRIDGE"));
+
         User owner = makeUser(USER_ID);
         FoodItem item = makeItem(owner);
-        FoodItemRequest request = new FoodItemRequest("Milk", FoodItem.FoodType.DAIRY, 1.0, FoodItem.Unit.L,
-                FoodItem.Location.FRIDGE, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
+                "FRIDGE", null, null, null, null);
         when(foodRepo.findById(1L)).thenReturn(Optional.of(item));
         assertThrows(ResponseStatusException.class, () -> service.updateItem(OTHER_USER_ID, 1L, request));
     }

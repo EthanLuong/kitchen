@@ -33,9 +33,8 @@ public class FoodItem {
     private String name;
 
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FoodType foodType;
+    private String foodType;
 
     // Quantity
     private Double quantity;
@@ -44,9 +43,8 @@ public class FoodItem {
     private Unit unit;
 
     // Location
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Location location;
+    private String location;
 
     // Dates
     private LocalDate expirationDate;
@@ -71,15 +69,9 @@ public class FoodItem {
 
     // ── Enums ──────────────────────────────────────────────────
 
-    public enum FoodType {
-        DAIRY, MEAT, PRODUCE, GRAIN, BEVERAGE, FROZEN, CONDIMENT, SNACK, OTHER
-    }
-
     public enum Unit {
         OZ, LBS, ML, L, G, KG, COUNT
     }
 
-    public enum Location {
-        FRIDGE, FREEZER, PANTRY, CABINET, COUNTER, OTHER
-    }
+
 }

@@ -46,13 +46,13 @@ public class FoodItemController {
 
     // GET /items/location/{location}  e.g. FRIDGE, FREEZER, PANTRY
     @GetMapping("/location/{location}")
-    public ResponseEntity<List<FoodItemResponse>> getByLocation(@PathVariable FoodItem.Location location, Principal principal) {
+    public ResponseEntity<List<FoodItemResponse>> getByLocation(@PathVariable String location, Principal principal) {
         return ResponseEntity.ok(service.getByLocation(userId(principal), location));
     }
 
     // GET /items/type/{type}  e.g. DAIRY, MEAT, PRODUCE
     @GetMapping("/type/{type}")
-    public ResponseEntity<List<FoodItemResponse>> getByType(@PathVariable FoodItem.FoodType type, Principal principal) {
+    public ResponseEntity<List<FoodItemResponse>> getByType(@PathVariable String type, Principal principal) {
         return ResponseEntity.ok(service.getByFoodType(userId(principal), type));
     }
 

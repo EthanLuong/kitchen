@@ -3,10 +3,15 @@ package com.example.kitchen.integration;
 
 import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.data.User;
+import com.example.kitchen.data.UserLocations;
+import com.example.kitchen.data.UserTypes;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.repository.FoodItemRepository;
+import com.example.kitchen.repository.UserLocationRepository;
 import com.example.kitchen.repository.UserRepository;
+import com.example.kitchen.repository.UserTypeRepository;
 import com.example.kitchen.service.JwtService;
+import com.example.kitchen.service.UserPreferencesService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +48,12 @@ public class FoodIntegrationTest {
     @Autowired
     private UserRepository userRepo;
 
+    @Autowired
+    private UserLocationRepository locationRepo;
+
+    @Autowired
+    private UserTypeRepository typeRepo;
+
     private RestTestClient restClient;
 
     @Autowired
@@ -72,14 +83,30 @@ public class FoodIntegrationTest {
         restClient = RestTestClient.bindTo(mockMvc).build();
         foodRepo.deleteAll();
         userRepo.deleteAll();
+        locationRepo.deleteAll();
+        typeRepo.deleteAll();
         User newUser = new User(null, "ethan", encoder.encode("strongpassword"), true, null);
         User savedUser = userRepo.save(newUser);
+
+        UserTypes type = new UserTypes();
+        UserLocations location = new UserLocations();
+        type.setName("PRODUCE");
+        location.setName("COUNTER");
+        type.setUser(savedUser);
+        location.setUser(savedUser);
+
+        typeRepo.save(type);
+        locationRepo.save(location);
+
+
+
+
         FoodItem item = new FoodItem();
         item.setUser(savedUser);
         item.setName("banana");
-        item.setFoodType(FoodItem.FoodType.PRODUCE);
+        item.setFoodType("PRODUCE");
         item.setUnit(FoodItem.Unit.COUNT);
-        item.setLocation(FoodItem.Location.COUNTER);
+        item.setLocation("COUNTER");
         foodId = foodRepo.save(item).getId();
         token = jwtService.createJWT(savedUser.getUserid().toString());
 
@@ -100,28 +127,28 @@ public class FoodIntegrationTest {
 
     @Test
     void createItem_validRequest_returns201() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.post().uri("/v1/items").header("Authorization", "Bearer " + token).body(request).exchange().expectStatus().isCreated();
 
     }
 
     @Test
     void createItem_unauthenticated_returns401() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.post().uri("/v1/items").body(request).exchange().expectStatus().isUnauthorized();
 
     }
 
     @Test
     void createItem_invalidRequest_returns400() {
-        FoodItemRequest request = new FoodItemRequest("", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.post().uri("/v1/items").header("Authorization", "Bearer " + token).body(request).exchange().expectStatus().isBadRequest();
 
     }
 
     @Test
     void updateItem_validRequest_returns200() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.put().uri("/v1/items/" + foodId).header("Authorization", "Bearer " + token).body(request).exchange().expectStatus().isOk();
 
     }
@@ -131,14 +158,14 @@ public class FoodIntegrationTest {
         User newUser = new User(null, "george", encoder.encode("strongpassword"), true, null);
         User savedUser = userRepo.save(newUser);
         String newToken = jwtService.createJWT(savedUser.getUserid().toString());
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.put().uri("/v1/items/1").header("Authorization", "Bearer " + newToken).body(request).exchange().expectStatus().isNotFound();
 
     }
 
     @Test
     void updateItem_unauthenticated_returns401() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.put().uri("/v1/items/1").body(request).exchange().expectStatus().isUnauthorized();
 
     }
@@ -162,6 +189,8 @@ public class FoodIntegrationTest {
         restClient.delete().uri("/v1/items/1").exchange().expectStatus().isUnauthorized();
 
     }
+
+    //TODO: Add test for new food type/location implementation
 
 
 

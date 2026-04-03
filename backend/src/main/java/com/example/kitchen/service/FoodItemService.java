@@ -4,6 +4,8 @@ import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
+import com.example.kitchen.dto.UserLocationResponse;
+import com.example.kitchen.dto.UserTypeResponse;
 import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +29,18 @@ public class FoodItemService {
 
     private final FoodItemRepository foodRepo;
     private final UserRepository userRepo;
+    private final UserPreferencesService preferencesService;
 
-    public FoodItemService(FoodItemRepository foodRepo, UserRepository userRepo) {
+    public FoodItemService(FoodItemRepository foodRepo, UserRepository userRepo, UserPreferencesService preferencesService) {
         this.foodRepo = foodRepo;
         this.userRepo = userRepo;
+        this.preferencesService = preferencesService;
     }
 
     // ── Create ─────────────────────────────────────────────────
     @Transactional
     public FoodItemResponse addItem(UUID userId, FoodItemRequest request) {
+        validatePreferences(userId, request);
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         FoodItem item = applyRequest(new FoodItem(), request);
@@ -67,13 +72,13 @@ public class FoodItemService {
                 .stream().map(FoodItemResponse::from).toList();
     }
 
-    public List<FoodItemResponse> getByLocation(UUID userId, FoodItem.Location location) {
+    public List<FoodItemResponse> getByLocation(UUID userId, String location) {
         log.info("Getting items in location {} for user with UUID {}", location, userId);
         return foodRepo.findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(userId, location)
                 .stream().map(FoodItemResponse::from).toList();
     }
 
-    public List<FoodItemResponse> getByFoodType(UUID userId, FoodItem.FoodType type) {
+    public List<FoodItemResponse> getByFoodType(UUID userId, String type) {
         log.info("Getting items with type {} for user with UUID {}", type, userId);
         return foodRepo.findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(userId, type)
                 .stream().map(FoodItemResponse::from).toList();
@@ -85,6 +90,8 @@ public class FoodItemService {
         log.info("Updating item with id {} for user with UUID {}", id, userId);
         FoodItem existing = findOwnedItem(userId, id);
         applyRequest(existing, request);
+        validatePreferences(userId, request);
+
         return FoodItemResponse.from(foodRepo.save(existing));
     }
     
@@ -127,5 +134,18 @@ public class FoodItemService {
         item.setOpenedAt(request.openedAt());
         item.setNotes(request.notes());
         return item;
+    }
+
+    private void validatePreferences(UUID userId, FoodItemRequest request){
+        List<String> validTypes = preferencesService.getUserTypes(userId).stream().map(UserTypeResponse::name).toList();
+        List<String> validLocations = preferencesService.getUserLocations(userId).stream().map(UserLocationResponse::name).toList();
+        if(!validTypes.contains(request.foodType())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid food type: " + request.foodType());
+        }
+
+        if(!validLocations.contains(request.location())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid location: " + request.location());
+        }
+
     }
 }
