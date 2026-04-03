@@ -216,8 +216,6 @@ public class FoodServiceTest {
         types.add(new UserTypeResponse(1L, "DAIRY"));
         locations.add(new UserLocationResponse(1L, "FRIDGE"));
 
-        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
-        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
         FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
                 "FRIDGE", null, null, null, null);
         when(foodRepo.findById(1L)).thenReturn(Optional.empty());
@@ -231,8 +229,6 @@ public class FoodServiceTest {
         types.add(new UserTypeResponse(1L, "DAIRY"));
         locations.add(new UserLocationResponse(1L, "FRIDGE"));
 
-        when(userPreferencesService.getUserLocations(any())).thenReturn(locations);
-        when(userPreferencesService.getUserTypes(any())).thenReturn(types);
         User owner = makeUser(USER_ID);
         FoodItem item = makeItem(owner);
         FoodItemRequest request = new FoodItemRequest("Milk", "DAIRY", 1.0, FoodItem.Unit.L,
