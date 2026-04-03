@@ -26,9 +26,9 @@ public interface FoodItemRepository extends JpaRepository<FoodItem, Long> {
 
     // Filter by location
     List<FoodItem> findByUserUseridAndLocationAndDeletedAtIsNullAndConsumedFalse(
-            UUID userid, FoodItem.Location location);
+            UUID userid, String location);
 
     // Filter by food type
     List<FoodItem> findByUserUseridAndFoodTypeAndDeletedAtIsNullAndConsumedFalse(
-            UUID userid, FoodItem.FoodType foodType);
+            UUID userid, String foodType);
 }

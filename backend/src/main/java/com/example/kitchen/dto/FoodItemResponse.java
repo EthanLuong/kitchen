@@ -8,10 +8,10 @@ import java.time.LocalDateTime;
 public record FoodItemResponse(
         Long id,
         String name,
-        FoodItem.FoodType foodType,
+        String foodType,
         Double quantity,
         FoodItem.Unit unit,
-        FoodItem.Location location,
+        String location,
         LocalDate expirationDate,
         LocalDate purchaseDate,
         LocalDate openedAt,

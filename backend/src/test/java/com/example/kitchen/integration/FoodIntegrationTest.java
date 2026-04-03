@@ -77,9 +77,9 @@ public class FoodIntegrationTest {
         FoodItem item = new FoodItem();
         item.setUser(savedUser);
         item.setName("banana");
-        item.setFoodType(FoodItem.FoodType.PRODUCE);
+        item.setFoodType("PRODUCE");
         item.setUnit(FoodItem.Unit.COUNT);
-        item.setLocation(FoodItem.Location.COUNTER);
+        item.setLocation("COUNTER");
         foodId = foodRepo.save(item).getId();
         token = jwtService.createJWT(savedUser.getUserid().toString());
 
@@ -100,28 +100,28 @@ public class FoodIntegrationTest {
 
     @Test
     void createItem_validRequest_returns201() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.post().uri("/v1/items").header("Authorization", "Bearer " + token).body(request).exchange().expectStatus().isCreated();
 
     }
 
     @Test
     void createItem_unauthenticated_returns401() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.post().uri("/v1/items").body(request).exchange().expectStatus().isUnauthorized();
 
     }
 
     @Test
     void createItem_invalidRequest_returns400() {
-        FoodItemRequest request = new FoodItemRequest("", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.post().uri("/v1/items").header("Authorization", "Bearer " + token).body(request).exchange().expectStatus().isBadRequest();
 
     }
 
     @Test
     void updateItem_validRequest_returns200() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.put().uri("/v1/items/" + foodId).header("Authorization", "Bearer " + token).body(request).exchange().expectStatus().isOk();
 
     }
@@ -131,14 +131,14 @@ public class FoodIntegrationTest {
         User newUser = new User(null, "george", encoder.encode("strongpassword"), true, null);
         User savedUser = userRepo.save(newUser);
         String newToken = jwtService.createJWT(savedUser.getUserid().toString());
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.put().uri("/v1/items/1").header("Authorization", "Bearer " + newToken).body(request).exchange().expectStatus().isNotFound();
 
     }
 
     @Test
     void updateItem_unauthenticated_returns401() {
-        FoodItemRequest request = new FoodItemRequest("Orange", FoodItem.FoodType.PRODUCE, null, null, FoodItem.Location.COUNTER, null, null, null, null);
+        FoodItemRequest request = new FoodItemRequest("Orange", "PRODUCE", null, null, "COUNTER", null, null, null, null);
         restClient.put().uri("/v1/items/1").body(request).exchange().expectStatus().isUnauthorized();
 
     }
@@ -162,6 +162,8 @@ public class FoodIntegrationTest {
         restClient.delete().uri("/v1/items/1").exchange().expectStatus().isUnauthorized();
 
     }
+
+    //TODO: Add test for new food type/location implementation
 
 
 

@@ -1,20 +1,18 @@
-import {
-  type FoodLocation,
-  type FoodType,
-  type SortOptions,
-  LOCATIONS,
-  TYPE,
-  SORT_TYPE,
-} from "../types/types";
+import { type SortOptions, SORT_TYPE } from "../types/types";
+
 type FilterBarProps = {
-  locationFilter: Set<FoodLocation>;
-  typeFilter: Set<FoodType>;
-  setLocationFilter: (location: FoodLocation | null) => void;
-  setTypeFilter: (type: FoodType | null) => void;
+  userLocations: string[];
+  userTypes: string[];
+  locationFilter: Set<string>;
+  typeFilter: Set<string>;
+  setLocationFilter: (location: string | null) => void;
+  setTypeFilter: (type: string | null) => void;
   setSortType: (type: SortOptions) => void;
 };
 
 export default function FilterBar({
+  userLocations,
+  userTypes,
   locationFilter,
   typeFilter,
   setLocationFilter,
@@ -26,7 +24,7 @@ export default function FilterBar({
       <div className="filterrow">
         <span>Location</span>
 
-        {LOCATIONS.map((location) => (
+        {userLocations.map((location) => (
           <button
             onClick={() => setLocationFilter(location)}
             key={location}
@@ -45,7 +43,7 @@ export default function FilterBar({
       </div>
       <div className="filterrow">
         <span>Type</span>
-        {TYPE.map((type) => (
+        {userTypes.map((type) => (
           <button
             onClick={() => setTypeFilter(type)}
             key={type}

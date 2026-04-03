@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { UNIT, TYPE, LOCATIONS, type FoodItemRequest } from "../types/types";
+import { UNIT, type FoodItemRequest } from "../types/types";
 type ItemModalProps = {
   initialValue: FoodItemRequest | null | "add";
+  userLocations: string[];
+  userTypes: string[];
   onSubmit: (data: FormData) => Promise<void>;
   setIsOpen: (state: null) => void;
 };
 
 export default function ItemModal({
   initialValue,
+  userLocations,
+  userTypes,
   onSubmit,
   setIsOpen,
 }: ItemModalProps) {
@@ -77,7 +81,7 @@ export default function ItemModal({
           <div className="formitem">
             <label>Type</label>
             <select name="foodType" defaultValue={defaultValues.foodType}>
-              {TYPE.map((type) => (
+              {userTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
                 </option>
@@ -87,7 +91,7 @@ export default function ItemModal({
           <div className="formitem">
             <label>Location</label>
             <select name="location" defaultValue={defaultValues.location}>
-              {LOCATIONS.map((location) => (
+              {userLocations.map((location) => (
                 <option key={location} value={location}>
                   {location}
                 </option>

@@ -25,15 +25,13 @@ export type SortOptions = (typeof SORT_TYPE)[number];
 
 export type Token = string;
 export type Unit = (typeof UNIT)[number];
-export type FoodType = (typeof TYPE)[number];
-export type FoodLocation = (typeof LOCATIONS)[number];
 
 export type FoodItemRequest = {
   name: string;
-  foodType: FoodType;
+  foodType: string;
   quantity: number;
   unit: Unit;
-  location: FoodLocation;
+  location: string;
   expirationDate: string;
   purchaseDate: string;
   openedAt: string;
@@ -42,10 +40,10 @@ export type FoodItemRequest = {
 export type FoodItemResponse = {
   id: number;
   name: string;
-  foodType: FoodType;
+  foodType: string;
   quantity: number;
   unit: Unit;
-  location: FoodLocation;
+  location: string;
   expirationDate: string;
   purchaseDate?: string;
   openedAt?: string;
@@ -53,6 +51,16 @@ export type FoodItemResponse = {
   consumed?: boolean;
   createdAt?: string;
   updatedAt?: string;
+};
+
+export type UserLocationResponse = {
+  id: number;
+  name: string;
+};
+
+export type UserTypeResponse = {
+  id: number;
+  name: string;
 };
 
 export type Page<T> = {
