@@ -25,7 +25,7 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
         </h1>
       </div>
       <div className="iteminfo">
-        <h1 className="itemName">{item.name}</h1>
+        <h1 className="itemName">{formatName(item.name)}</h1>
         <h2 className="quantity">
           <span className="number">{item.quantity + " "}</span>
           {item.unit + " "}
@@ -33,4 +33,15 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
       </div>
     </div>
   );
+}
+
+function formatName(name: string) {
+  const words = name.toLowerCase().split(" ");
+  const formattedName = words.reduce(
+    (acc, curVal) =>
+      acc + (curVal.charAt(0).toUpperCase() + curVal.slice(1) + " "),
+    "",
+  );
+
+  return formattedName.trim();
 }

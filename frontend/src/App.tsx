@@ -5,6 +5,7 @@ import {
   type SortOptions,
   type UserLocationResponse,
   type UserTypeResponse,
+  type ItemDefaultsResponse,
 } from "./types/types";
 import {
   getAllFoodItems,
@@ -18,11 +19,11 @@ import {
   addUserLocations,
   deleteUserLocations,
   deleteUserTypes,
+  getItemDefaults,
 } from "./api/fetchFood";
 import ItemModal from "./components/ItemModal";
 import AuthenticationModal from "./components/AuthCard";
 import FilterBar from "./components/FilterBar";
-import FoodList from "./components/FoodList";
 import NavBar from "./components/NavBar";
 import {
   responseToFoodItemRequest,
@@ -31,6 +32,7 @@ import {
 
 import "./App.css";
 import SettingsModal from "./components/SettingsModal";
+import FoodSection from "./components/FoodSection";
 
 function App() {
   const [foodList, setFoodList] = useState<FoodItemResponse[]>([]);
@@ -51,20 +53,24 @@ function App() {
     [],
   );
   const [settingModal, setSettingModal] = useState(false);
+  const [itemDefaults, setItemDefaults] = useState<ItemDefaultsResponse[]>([]);
+  const [groupBy, setGroupBy] = useState<"none" | "location" | "type">("none");
 
   useEffect(() => {
     if (!authToken) return;
     async function fetchItems() {
       try {
         setFoodLoading(true);
-        const [items, types, locations] = await Promise.all([
+        const [items, types, locations, defaults] = await Promise.all([
           getAllFoodItems(authToken as string, setToken),
           getUserTypes(authToken as string, setToken),
           getUserLocations(authToken as string, setToken),
+          getItemDefaults(authToken as string, setToken),
         ]);
         setFoodList(items.content);
         setUserTypes(types);
         setUserLocations(locations);
+        setItemDefaults(defaults);
       } catch (err) {
         setFoodError("Failed to load items");
         setToken(null);
@@ -98,6 +104,14 @@ function App() {
       authToken,
       setToken,
     );
+    const defaults: ItemDefaultsResponse = {
+      name: request.name.toUpperCase(),
+      foodType: request.foodType.toUpperCase(),
+      unit: request.unit.toUpperCase(),
+      location: request.location.toUpperCase(),
+      expirationDays: 0,
+    };
+    setItemDefaults((prev) => [...prev, defaults]);
     setFoodList((prev) => [...prev, response]);
     setModalState(null);
   }
@@ -208,6 +222,25 @@ function App() {
     setSettingModal(false);
   }
 
+  function groupItems(
+    items: FoodItemResponse[],
+  ): Map<string, FoodItemResponse[]> {
+    const map = new Map<string, FoodItemResponse[]>([]);
+    switch (groupBy) {
+      case "none":
+        return new Map([["all", items]]);
+      case "location":
+        userLocations.forEach((location) => map.set(location.name, []));
+        items.forEach((item) => map.get(item.location)?.push(item));
+        break;
+      case "type":
+        userTypes.forEach((type) => map.set(type.name, []));
+        items.forEach((item) => map.get(item.foodType)?.push(item));
+        break;
+    }
+    return map;
+  }
+
   const modalSubmitHandler =
     modalState === "add" || modalState === null
       ? handleAddedItem
@@ -219,6 +252,9 @@ function App() {
     )
     .filter((item) => typeFilter.size === 0 || typeFilter.has(item.foodType))
     .sort(sortCards);
+
+  const grouped = groupItems(visibleItems);
+
   const initialForm =
     modalState !== "add" && modalState != null
       ? responseToFoodItemRequest(modalState)
@@ -237,19 +273,23 @@ function App() {
           onClose={closeModals}
         ></SettingsModal>
       )}
-      <ItemModal
-        userLocations={userLocations.map((location) => location.name)}
-        userTypes={userTypes.map((type) => type.name)}
-        initialValue={initialForm}
-        setIsOpen={setModalState}
-        onSubmit={modalSubmitHandler}
-      ></ItemModal>
-      <AuthenticationModal
-        isOpen={authIsOpen}
-        mode={isLogin}
-        setMode={setIsLogin}
-        setToken={setToken}
-      ></AuthenticationModal>
+      {modalState && (
+        <ItemModal
+          userLocations={userLocations.map((location) => location.name)}
+          userTypes={userTypes.map((type) => type.name)}
+          initialValue={initialForm}
+          itemDefaults={itemDefaults}
+          setIsOpen={setModalState}
+          onSubmit={modalSubmitHandler}
+        ></ItemModal>
+      )}
+      {authIsOpen && (
+        <AuthenticationModal
+          mode={isLogin}
+          setMode={setIsLogin}
+          setToken={setToken}
+        ></AuthenticationModal>
+      )}
       <NavBar
         setModal={setModalState}
         handleLogout={handleLogout}
@@ -269,15 +309,22 @@ function App() {
         setTypeFilter={typeFilterHandler}
         setLocationFilter={locationFilterHandler}
         setSortType={setSortBy}
+        setGroupBy={setGroupBy}
       ></FilterBar>
       {foodLoading ? (
         <div>Loading...</div>
       ) : (
-        <FoodList
-          foodList={visibleItems}
-          onDelete={handleDeleteFoodItem}
-          onEdit={setModalState}
-        />
+        [...grouped.entries()].map(([category, foodList]) =>
+          foodList.length > 0 ? (
+            <FoodSection
+              title={category}
+              showTitle={groupBy !== "none"}
+              foodList={foodList}
+              onDelete={handleDeleteFoodItem}
+              onEdit={setModalState}
+            ></FoodSection>
+          ) : null,
+        )
       )}
     </>
   );

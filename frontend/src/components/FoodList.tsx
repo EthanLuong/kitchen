@@ -3,7 +3,7 @@ import FoodCard from "./FoodCard";
 type FoodListProps = {
   foodList: FoodItemResponse[];
   onDelete: (item: FoodItemResponse) => void;
-  onEdit: (item: FoodItemResponse | "add") => void;
+  onEdit: (item: FoodItemResponse) => void;
 };
 
 export default function FoodList({
@@ -21,9 +21,6 @@ export default function FoodList({
           onEdit={onEdit}
         />
       ))}
-      <button className="buttoncard" onClick={() => onEdit("add")}>
-        Add Item
-      </button>
     </div>
   );
 }

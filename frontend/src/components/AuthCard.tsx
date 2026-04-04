@@ -2,14 +2,12 @@ import { useState } from "react";
 import { getTokenLogin, createNewUser } from "../api/fetchFood";
 
 type AuthenticationModalProps = {
-  isOpen: boolean;
   mode: boolean;
   setMode: React.Dispatch<React.SetStateAction<boolean>>;
   setToken: (token: string | null) => void;
 };
 
 export default function AuthenticationModal({
-  isOpen,
   mode,
   setMode,
   setToken,
@@ -43,10 +41,6 @@ export default function AuthenticationModal({
     } finally {
       setIsLoading(false);
     }
-  }
-
-  if (!isOpen) {
-    return null;
   }
 
   return (

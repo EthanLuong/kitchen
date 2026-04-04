@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { UNIT, type FoodItemRequest } from "../types/types";
+import {
+  UNIT,
+  type FoodItemRequest,
+  type ItemDefaultsResponse,
+  type Unit,
+} from "../types/types";
 type ItemModalProps = {
   initialValue: FoodItemRequest | null | "add";
   userLocations: string[];
   userTypes: string[];
+  itemDefaults: ItemDefaultsResponse[];
   onSubmit: (data: FormData) => Promise<void>;
   setIsOpen: (state: null) => void;
 };
@@ -12,16 +18,16 @@ export default function ItemModal({
   initialValue,
   userLocations,
   userTypes,
+  itemDefaults,
   onSubmit,
   setIsOpen,
 }: ItemModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [itemError, setError] = useState<null | string>(null);
-
-  if (!initialValue) return null;
+  const [suggestions, setSuggestions] = useState<ItemDefaultsResponse[]>([]);
 
   const defaultValues: FoodItemRequest =
-    initialValue == "add"
+    initialValue == "add" || initialValue == null
       ? {
           name: "",
           foodType: "OTHER",
@@ -34,6 +40,11 @@ export default function ItemModal({
           notes: "",
         }
       : initialValue;
+  const [itemName, setItemName] = useState(defaultValues.name);
+  const [itemType, setItemType] = useState(defaultValues.foodType);
+  const [itemLocation, setItemLocation] = useState(defaultValues.location);
+  const [itemUnit, setItemUnit] = useState(defaultValues.unit);
+  const [itemExpDate, setItemExpDate] = useState(defaultValues.expirationDate);
 
   async function handleSubmit(event: React.SubmitEvent) {
     event.preventDefault();
@@ -50,13 +61,55 @@ export default function ItemModal({
     }
   }
 
+  function handleNameChange(name: string) {
+    setItemName(name);
+    if (name.trim() === "") {
+      setSuggestions([]);
+      return;
+    }
+
+    const suggestions = itemDefaults.filter((defaultValues) =>
+      defaultValues.name.toUpperCase().includes(name.trim().toUpperCase()),
+    );
+    setSuggestions(suggestions);
+  }
+
+  function handleSuggestionSelect(defaults: ItemDefaultsResponse) {
+    setItemName(defaults.name);
+    setItemUnit(defaults.unit as Unit);
+    setItemLocation(defaults.location);
+    setItemType(defaults.foodType);
+    if (defaults.expirationDays) {
+      const date = new Date();
+      date.setDate(date.getDate() + defaults.expirationDays);
+      setItemExpDate(date.toISOString().split("T")[0]);
+    }
+    setSuggestions([]);
+  }
+
+  if (!initialValue) return null;
   return (
     <div className="overlay">
       <div className="modalcard">
         <form className="modalform" onSubmit={handleSubmit}>
-          <div className="formitem">
+          <div className="formitem autocomplete-wrapper">
             <label>Name</label>
-            <input type="text" defaultValue={defaultValues.name} name="name" />
+            <input
+              type="text"
+              name="name"
+              value={itemName}
+              onChange={(e) => handleNameChange(e.target.value)}
+              autoComplete="off"
+            />
+            {suggestions.length > 0 && (
+              <ul className="autocomplete-dropdown">
+                {suggestions.map((s) => (
+                  <li key={s.name} onClick={() => handleSuggestionSelect(s)}>
+                    {s.name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="formitem">
             <label>Quantity</label>
@@ -70,7 +123,11 @@ export default function ItemModal({
           </div>
           <div className="formitem">
             <label>Unit</label>
-            <select name="unit" defaultValue={defaultValues.unit}>
+            <select
+              name="unit"
+              value={itemUnit}
+              onChange={(e) => setItemUnit(e.target.value as Unit)}
+            >
               {UNIT.map((unit) => (
                 <option key={unit} value={unit}>
                   {unit}
@@ -80,7 +137,11 @@ export default function ItemModal({
           </div>
           <div className="formitem">
             <label>Type</label>
-            <select name="foodType" defaultValue={defaultValues.foodType}>
+            <select
+              name="foodType"
+              value={itemType}
+              onChange={(e) => setItemType(e.target.value)}
+            >
               {userTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
@@ -90,7 +151,11 @@ export default function ItemModal({
           </div>
           <div className="formitem">
             <label>Location</label>
-            <select name="location" defaultValue={defaultValues.location}>
+            <select
+              name="location"
+              value={itemLocation}
+              onChange={(e) => setItemLocation(e.target.value)}
+            >
               {userLocations.map((location) => (
                 <option key={location} value={location}>
                   {location}
@@ -99,11 +164,20 @@ export default function ItemModal({
             </select>
           </div>
           <div className="formitem">
+            <label>Purchase Date</label>
+            <input
+              type="date"
+              name="purchaseDate"
+              defaultValue={defaultValues.purchaseDate}
+            ></input>
+          </div>
+          <div className="formitem">
             <label>Expiration</label>
             <input
               type="date"
               name="expirationDate"
-              defaultValue={defaultValues.expirationDate}
+              value={itemExpDate}
+              onChange={(e) => setItemExpDate(e.target.value)}
             ></input>
           </div>
 

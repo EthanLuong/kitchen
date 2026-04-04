@@ -1,5 +1,5 @@
-import { type SortOptions, SORT_TYPE } from "../types/types";
-
+import { type SortOptions } from "../types/types";
+type GroupByOptions = "none" | "location" | "type";
 type FilterBarProps = {
   userLocations: string[];
   userTypes: string[];
@@ -8,6 +8,7 @@ type FilterBarProps = {
   setLocationFilter: (location: string | null) => void;
   setTypeFilter: (type: string | null) => void;
   setSortType: (type: SortOptions) => void;
+  setGroupBy: (grouping: "none" | "location" | "type") => void;
 };
 
 export default function FilterBar({
@@ -17,7 +18,8 @@ export default function FilterBar({
   typeFilter,
   setLocationFilter,
   setTypeFilter,
-  setSortType,
+  // setSortType,
+  setGroupBy,
 }: FilterBarProps) {
   return (
     <div className="filterbar">
@@ -61,8 +63,9 @@ export default function FilterBar({
 
         <button onClick={() => setTypeFilter(null)}>Clear</button>
       </div>
+
       <div className="filterrow">
-        <select
+        {/* <select
           name="sortby"
           onChange={(e) => setSortType(e.target.value as SortOptions)}
         >
@@ -71,6 +74,14 @@ export default function FilterBar({
               {sort}
             </option>
           ))}
+        </select> */}
+        <select
+          name="groupby"
+          onChange={(e) => setGroupBy(e.target.value as GroupByOptions)}
+        >
+          <option value="none">none</option>
+          <option value="location">location</option>
+          <option value="type">type</option>
         </select>
       </div>
     </div>
