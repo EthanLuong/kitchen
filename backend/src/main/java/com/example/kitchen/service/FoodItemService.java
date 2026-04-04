@@ -18,8 +18,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 
 @Transactional(readOnly = true)
@@ -30,11 +33,13 @@ public class FoodItemService {
     private final FoodItemRepository foodRepo;
     private final UserRepository userRepo;
     private final UserPreferencesService preferencesService;
+    private final ItemDefaultsService defaultsService;
 
-    public FoodItemService(FoodItemRepository foodRepo, UserRepository userRepo, UserPreferencesService preferencesService) {
+    public FoodItemService(FoodItemRepository foodRepo, UserRepository userRepo, UserPreferencesService preferencesService, ItemDefaultsService defaultsService) {
         this.foodRepo = foodRepo;
         this.userRepo = userRepo;
         this.preferencesService = preferencesService;
+        this.defaultsService = defaultsService;
     }
 
     // ── Create ─────────────────────────────────────────────────
@@ -43,8 +48,18 @@ public class FoodItemService {
         validatePreferences(userId, request);
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         FoodItem item = applyRequest(new FoodItem(), request);
         item.setUser(user);
+
+        Integer expDays;
+
+        if(request.expirationDate() != null && request.purchaseDate() != null){
+            expDays = Math.toIntExact(DAYS.between(request.purchaseDate(), request.expirationDate()));
+            defaultsService.upsert(userId, item.getName(), item.getFoodType(), item.getUnit().toString(), item.getLocation(), expDays);
+        }
+
+
         log.info("Item with id {} created for user with UUID {}", item.getId(), userId);
         return FoodItemResponse.from(foodRepo.save(item));
     }
@@ -88,11 +103,18 @@ public class FoodItemService {
     @Transactional
     public FoodItemResponse updateItem(UUID userId, Long id, FoodItemRequest request) {
         log.info("Updating item with id {} for user with UUID {}", id, userId);
-        FoodItem existing = findOwnedItem(userId, id);
-        applyRequest(existing, request);
+
+        FoodItem item = findOwnedItem(userId, id);
+        applyRequest(item, request);
+
         validatePreferences(userId, request);
 
-        return FoodItemResponse.from(foodRepo.save(existing));
+        Integer expDays;
+        if(request.expirationDate() != null && request.purchaseDate() != null){
+            expDays = Math.toIntExact(DAYS.between(request.purchaseDate(), request.expirationDate()));
+            defaultsService.upsert(userId, item.getName(), item.getFoodType(), item.getUnit().toString(), item.getLocation(), expDays);
+        }
+        return FoodItemResponse.from(foodRepo.save(item));
     }
     
     @Transactional
@@ -124,11 +146,11 @@ public class FoodItemService {
     }
 
     private FoodItem applyRequest(FoodItem item, FoodItemRequest request) {
-        item.setName(request.name());
-        item.setFoodType(request.foodType());
+        item.setName(request.name().toUpperCase());
+        item.setFoodType(request.foodType().toUpperCase());
         item.setQuantity(request.quantity());
         item.setUnit(request.unit());
-        item.setLocation(request.location());
+        item.setLocation(request.location().toUpperCase());
         item.setExpirationDate(request.expirationDate());
         item.setPurchaseDate(request.purchaseDate());
         item.setOpenedAt(request.openedAt());

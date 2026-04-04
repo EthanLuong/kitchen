@@ -72,3 +72,11 @@ export type Page<T> = {
   first: boolean;
   last: boolean;
 };
+
+export type ItemDefaultsResponse = {
+  name: string;
+  foodType: string;
+  unit: string;
+  location: string;
+  expirationDays: number;
+};

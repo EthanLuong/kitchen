@@ -1,8 +1,11 @@
 package com.example.kitchen.controller;
 
+import com.example.kitchen.dto.ItemDefaultsResponse;
 import com.example.kitchen.dto.PreferenceRequest;
 import com.example.kitchen.dto.UserLocationResponse;
 import com.example.kitchen.dto.UserTypeResponse;
+import com.example.kitchen.exception.DefaultsNotFoundException;
+import com.example.kitchen.service.ItemDefaultsService;
 import com.example.kitchen.service.UserPreferencesService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +25,11 @@ import java.util.UUID;
 public class UserPreferencesController {
 
     private final UserPreferencesService preferencesService;
+    private final ItemDefaultsService defaultsService;
 
-    public UserPreferencesController(UserPreferencesService preferencesService){
+    public UserPreferencesController(UserPreferencesService preferencesService, ItemDefaultsService defaultsService){
     this.preferencesService = preferencesService;
+    this.defaultsService = defaultsService;
 }
 
     @GetMapping("/types")
@@ -67,5 +72,21 @@ public class UserPreferencesController {
         UUID userId = UUID.fromString(principal.getName());
         preferencesService.deleteLocation(userId, id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/item-defaults")
+    public ResponseEntity<List<ItemDefaultsResponse>> getAllItemDefaults(Principal principal){
+        UUID userId = UUID.fromString(principal.getName());
+        return ResponseEntity.ok().body(defaultsService.getAllDefaults(userId));
+    }
+
+    @GetMapping("/item-defaults/{name}")
+    public ResponseEntity<ItemDefaultsResponse> getItemDefaults(@PathVariable String name, Principal principal){
+        try{
+            return ResponseEntity.ok(defaultsService.getDefaults(UUID.fromString(principal.getName()),name));
+        } catch (DefaultsNotFoundException ex){
+            return ResponseEntity.noContent().build();
+        }
+
     }
     }

@@ -5,6 +5,7 @@ import {
   type Page,
   type UserLocationResponse,
   type UserTypeResponse,
+  type ItemDefaultsResponse,
 } from "../types/types";
 
 const API_URI = import.meta.env.VITE_API_URL;
@@ -331,4 +332,24 @@ export async function deleteUserTypes(
     const errorBody = await response.json();
     throw new Error(errorBody.detail ?? "Something went wrong");
   }
+}
+
+export async function getItemDefaults(
+  token: Token,
+  setToken: (token: Token | null) => void,
+): Promise<ItemDefaultsResponse[]> {
+  const response = await apiFetch(
+    `${API_URI}/user/item-defaults`,
+    {
+      method: "GET",
+    },
+    token,
+    setToken,
+  );
+  if (!response.ok) {
+    const errorBody = await response.json();
+    throw new Error(errorBody.detail ?? "Something went wrong");
+  }
+  const data = await response.json();
+  return data;
 }
