@@ -74,9 +74,14 @@ public class UserPreferencesService {
         userLocation.setUser(user);
         userLocation.setName(location);
 
-        UserLocations result = locationRepo.save(userLocation);
+        try{
+            UserLocations result = locationRepo.save(userLocation);
+            return new UserLocationResponse(result.getId(), result.getName());
+        } catch(DataIntegrityViolationException ex) {
+            log.warn("Adding type for user with userid {} failed", userid, ex);
+            throw ex;
+        }
 
-        return new UserLocationResponse(result.getId(), result.getName());
     }
     @Transactional
     public void deleteLocation(UUID userid, Long id){

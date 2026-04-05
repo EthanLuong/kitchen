@@ -46,6 +46,6 @@ public class RateLimiterFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request){
         String path = request.getServletPath();
-        return !path.contains("/auth/login");
+        return !path.contains("/auth/login") && !path.contains("/auth/signup");
     }
     }

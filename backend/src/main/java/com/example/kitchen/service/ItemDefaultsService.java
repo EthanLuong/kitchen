@@ -3,10 +3,12 @@ package com.example.kitchen.service;
 import com.example.kitchen.data.ItemDefaults;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.ItemDefaultsResponse;
+import com.example.kitchen.exception.DefaultsNotFoundException;
 import com.example.kitchen.repository.ItemDefaultsRepository;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +25,7 @@ public class ItemDefaultsService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public void upsert(UUID userId, String name, String foodType, String unit, String location, Integer expiryDays){
         ItemDefaults defaults = defaultsRepository.findByUserUseridAndName(userId, name).orElse(new ItemDefaults());
         User user = userRepository.getReferenceById(userId);
@@ -35,7 +38,7 @@ public class ItemDefaultsService {
         defaultsRepository.save(defaults);
     }
     public ItemDefaultsResponse getDefaults(UUID userid, String name){
-        ItemDefaults defaults = defaultsRepository.findByUserUseridAndName(userid, name).orElseThrow();
+        ItemDefaults defaults = defaultsRepository.findByUserUseridAndName(userid, name).orElseThrow(()-> new DefaultsNotFoundException("Item defaults with name " + name + " does not exist"));
         return new ItemDefaultsResponse(defaults.getName(), defaults.getFoodType(), defaults.getUnit(), defaults.getLocation(), defaults.getExpirationDays());
     }
 

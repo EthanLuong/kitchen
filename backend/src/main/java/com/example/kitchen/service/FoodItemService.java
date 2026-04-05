@@ -159,8 +159,9 @@ public class FoodItemService {
     }
 
     private void validatePreferences(UUID userId, FoodItemRequest request){
-        List<String> validTypes = preferencesService.getUserTypes(userId).stream().map(UserTypeResponse::name).toList();
-        List<String> validLocations = preferencesService.getUserLocations(userId).stream().map(UserLocationResponse::name).toList();
+        List<String> validTypes = preferencesService.getUserTypes(userId).stream().map((type) -> type.name().toUpperCase()).toList();
+        List<String> validLocations = preferencesService.getUserLocations(userId).stream().map((location)-> location.name().toUpperCase()).toList();
+
         if(!validTypes.contains(request.foodType())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid food type: " + request.foodType());
         }

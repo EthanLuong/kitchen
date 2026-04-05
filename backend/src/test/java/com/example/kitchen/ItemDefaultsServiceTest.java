@@ -3,6 +3,7 @@ package com.example.kitchen;
 import com.example.kitchen.data.ItemDefaults;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.ItemDefaultsResponse;
+import com.example.kitchen.exception.DefaultsNotFoundException;
 import com.example.kitchen.repository.ItemDefaultsRepository;
 import com.example.kitchen.repository.UserRepository;
 import com.example.kitchen.service.ItemDefaultsService;
@@ -47,7 +48,6 @@ public class ItemDefaultsServiceTest {
         user.setUserid(USER_ID);
         when(repo.findByUserUseridAndName(USER_ID, "MILK")).thenReturn(Optional.empty());
         when(userRepository.getReferenceById(USER_ID)).thenReturn(user);
-        when(repo.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         service.upsert(USER_ID, "MILK", "DAIRY", "LITRE", "FRIDGE", 7);
 
@@ -128,7 +128,7 @@ public class ItemDefaultsServiceTest {
         when(repo.findByUserUseridAndName(USER_ID, "MILK")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.getDefaults(USER_ID, "MILK"))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(DefaultsNotFoundException.class);
     }
 
     @Test
