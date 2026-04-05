@@ -2,16 +2,17 @@ package com.example.kitchen.dto;
 
 import com.example.kitchen.data.FoodItem;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
+@ValidDateRange
 public record FoodItemRequest(
         @NotBlank String name,
-        @NotNull String foodType,
-        Double quantity,
+        @NotBlank String foodType,
+        @Positive Double quantity,
         FoodItem.Unit unit,
-        @NotNull String location,
+        @NotBlank String location,
         LocalDate expirationDate,
         LocalDate purchaseDate,
         LocalDate openedAt,

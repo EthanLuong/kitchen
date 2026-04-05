@@ -15,6 +15,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemDefaultsService {
 
     private final ItemDefaultsRepository defaultsRepository;

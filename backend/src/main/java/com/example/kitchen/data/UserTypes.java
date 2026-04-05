@@ -10,7 +10,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name="user_types", uniqueConstraints = {@UniqueConstraint(name = "UniquerUserAndType", columnNames = {"user", "name"})})
+@Table(name="user_types", uniqueConstraints = {@UniqueConstraint(name = "UniqueUserAndType", columnNames = {"user", "name"})})
 @NoArgsConstructor
 public class UserTypes {
     @Id
