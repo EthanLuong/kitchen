@@ -1,12 +1,7 @@
 package com.example.kitchen.integration;
 
 import com.example.kitchen.dto.*;
-import com.example.kitchen.repository.UserLocationRepository;
-import com.example.kitchen.repository.UserRepository;
-import com.example.kitchen.repository.UserTypeRepository;
 import com.example.kitchen.service.JwtService;
-import com.example.kitchen.service.UserPreferencesService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +29,6 @@ public class UserPreferenceIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private UserLocationRepository userLocationRepo;
-
-    @Autowired
-    private UserTypeRepository userTypeRepo;
-
-    @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private UserPreferencesService userPreferencesService;
 
     @Autowired
     private JwtService jwtService;
@@ -147,7 +130,7 @@ public class UserPreferenceIntegrationTest {
 
     @Test
     void deleteLocation_belongingToOtherUser_returnsForbidden() {
-        restTestClient.delete().uri("/v1/user/locations/21f").header("Authorization", "Bearer " + userToken).exchange()
+        restTestClient.delete().uri("/v1/user/locations/21").header("Authorization", "Bearer " + userToken).exchange()
                 .expectStatus().isForbidden();
     }
 
