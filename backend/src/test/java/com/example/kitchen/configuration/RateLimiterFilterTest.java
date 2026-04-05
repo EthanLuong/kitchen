@@ -18,7 +18,6 @@ class RateLimiterFilterTest {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private FilterChain filterChain;
-    private PrintWriter writer;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -26,7 +25,7 @@ class RateLimiterFilterTest {
         request = mock(HttpServletRequest.class);
         response = mock(HttpServletResponse.class);
         filterChain = mock(FilterChain.class);
-        writer = mock(PrintWriter.class);
+        PrintWriter writer = mock(PrintWriter.class);
 
         when(request.getRemoteAddr()).thenReturn("127.0.0.1");
         when(request.getServletPath()).thenReturn("/v1/auth/login");

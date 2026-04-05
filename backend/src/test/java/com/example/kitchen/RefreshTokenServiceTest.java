@@ -34,9 +34,6 @@ class RefreshTokenServiceTest {
     @InjectMocks
     RefreshTokenService service;
 
-    @Captor
-    ArgumentCaptor<List<RefreshToken>> captor;
-
     private User testUser;
 
     @BeforeEach

@@ -3,7 +3,6 @@ package com.example.kitchen.service;
 import com.example.kitchen.data.User;
 import com.example.kitchen.data.UserLocations;
 import com.example.kitchen.data.UserTypes;
-import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.UserLocationResponse;
 import com.example.kitchen.dto.UserTypeResponse;
 import com.example.kitchen.event.UserCreatedEvent;

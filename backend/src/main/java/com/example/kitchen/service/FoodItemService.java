@@ -4,8 +4,6 @@ import com.example.kitchen.data.FoodItem;
 import com.example.kitchen.data.User;
 import com.example.kitchen.dto.FoodItemRequest;
 import com.example.kitchen.dto.FoodItemResponse;
-import com.example.kitchen.dto.UserLocationResponse;
-import com.example.kitchen.dto.UserTypeResponse;
 import com.example.kitchen.repository.FoodItemRepository;
 import com.example.kitchen.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
