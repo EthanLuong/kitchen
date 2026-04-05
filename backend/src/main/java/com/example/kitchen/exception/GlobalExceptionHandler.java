@@ -1,5 +1,6 @@
 package com.example.kitchen.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
-
 
 import java.util.stream.Collectors;
 
@@ -47,22 +47,44 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceOwnershipException.class)
     public ProblemDetail handleInvalidOwner(ResourceOwnershipException ex){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        response.setTitle("Access denied");
+        return response;
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataViolation(DataIntegrityViolationException ex){
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "A record with that value already exists");
+        response.setTitle("Duplicate entry");
+        return response;
+    }
+
+    @ExceptionHandler(DefaultsNotFoundException.class)
+    public ProblemDetail handleDefaultsNotFound(DefaultsNotFoundException ex){
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        response.setTitle("Not found");
+        return response;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ProblemDetail handleConstraintViolation(ConstraintViolationException ex){
+        String details = ex.getConstraintViolations()
+                .stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
+        log.warn("Constraint violation: {}", details);
+        ProblemDetail response = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, details);
+        response.setTitle("Invalid arguments");
+        return response;
     }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ProblemDetail handleResponseStatus(ResponseStatusException ex){
         ProblemDetail response = ProblemDetail.forStatusAndDetail(ex.getStatusCode(), "Something went wrong");
         response.setTitle("Internal Server Error");
-
         log.error("Unexpected error", ex);
         return response;
-
     }
 
 }

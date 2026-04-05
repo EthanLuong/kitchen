@@ -1,12 +1,7 @@
 package com.example.kitchen.integration;
 
 import com.example.kitchen.dto.*;
-import com.example.kitchen.repository.UserLocationRepository;
-import com.example.kitchen.repository.UserRepository;
-import com.example.kitchen.repository.UserTypeRepository;
 import com.example.kitchen.service.JwtService;
-import com.example.kitchen.service.UserPreferencesService;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +29,6 @@ public class UserPreferenceIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private UserLocationRepository userLocationRepo;
-
-    @Autowired
-    private UserTypeRepository userTypeRepo;
-
-    @Autowired
-    private UserRepository userRepo;
-
-    @Autowired
-    private UserPreferencesService userPreferencesService;
 
     @Autowired
     private JwtService jwtService;
@@ -129,37 +112,37 @@ public class UserPreferenceIntegrationTest {
 
     @Test
     void deleteType_returnsNoContent() {
-        restTestClient.delete().uri("/v1/user/types/10").header("Authorization", "Bearer " + userToken).exchange()
+        restTestClient.delete().uri("/v1/user/types/20").header("Authorization", "Bearer " + userToken).exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
     void deleteLocation_returnsNoContent() {
-        restTestClient.delete().uri("/v1/user/locations/10").header("Authorization", "Bearer " + userToken).exchange()
+        restTestClient.delete().uri("/v1/user/locations/20").header("Authorization", "Bearer " + userToken).exchange()
                 .expectStatus().isNoContent();
     }
 
     @Test
     void deleteType_belongingToOtherUser_returnsForbidden() {
-        restTestClient.delete().uri("/v1/user/types/11").header("Authorization", "Bearer " + userToken).exchange()
+        restTestClient.delete().uri("/v1/user/types/21").header("Authorization", "Bearer " + userToken).exchange()
                 .expectStatus().isForbidden();
     }
 
     @Test
     void deleteLocation_belongingToOtherUser_returnsForbidden() {
-        restTestClient.delete().uri("/v1/user/locations/11").header("Authorization", "Bearer " + userToken).exchange()
+        restTestClient.delete().uri("/v1/user/locations/21").header("Authorization", "Bearer " + userToken).exchange()
                 .expectStatus().isForbidden();
     }
 
     @Test
-    void addType_duplicate_returnsError() {
+    void addType_duplicate_returnsConflict() {
         restTestClient.post().uri("/v1/user/types").body(new PreferenceRequest("DAIRY")).header("Authorization", "Bearer " + userToken).exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isEqualTo(409);
     }
     @Test
-    void addLocation_duplicate_returnsError() {
+    void addLocation_duplicate_returnsConflict() {
         restTestClient.post().uri("/v1/user/locations").body(new PreferenceRequest("FRIDGE")).header("Authorization", "Bearer " + userToken).exchange()
-                .expectStatus().isBadRequest();
+                .expectStatus().isEqualTo(409);
     }
 
 
