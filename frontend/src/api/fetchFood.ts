@@ -14,6 +14,34 @@ async function throwIfNotOk(response: Response): Promise<void> {
   if (response.ok) return;
   const errorBody = await response.json().catch(() => ({}));
   throw new Error(errorBody.detail ?? "Something went wrong");
+let refreshInFlight: Promise<string> | null = null;
+
+async function refreshAccessToken(
+  setToken: (token: Token | null) => void,
+): Promise<string> {
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = (async () => {
+    const refreshResponse = await fetch(`${API_URI}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!refreshResponse.ok) {
+      setToken(null);
+      localStorage.removeItem("token");
+      throw new Error("Session expired. Log in again");
+    }
+
+    const { accessToken }: { accessToken: string } = await refreshResponse.json();
+    setToken(accessToken);
+    localStorage.setItem("token", accessToken);
+    return accessToken;
+  })().finally(() => {
+    refreshInFlight = null;
+  });
+
+  return refreshInFlight;
 }
 
 export async function apiFetch(
@@ -32,20 +60,7 @@ export async function apiFetch(
 
   if (response.status !== 401) return response;
 
-  const refreshResponse = await fetch(`${API_URI}/auth/refresh`, {
-    method: "POST",
-    credentials: "include",
-  });
-
-  if (!refreshResponse.ok) {
-    setToken(null);
-    localStorage.removeItem("token");
-    throw new Error("Session expired. Log in again");
-  }
-
-  const { accessToken } = await refreshResponse.json();
-  setToken(accessToken);
-  localStorage.setItem("token", accessToken);
+  const accessToken = await refreshAccessToken(setToken);
 
   return fetch(url, {
     ...options,
