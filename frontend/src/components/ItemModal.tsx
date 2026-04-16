@@ -5,6 +5,7 @@ import {
   type ItemDefaultsResponse,
   type Unit,
 } from "../types/types";
+import { todayISO } from "../utility/utils";
 type ItemModalProps = {
   initialValue: FoodItemRequest | null | "add";
   userLocations: string[];
@@ -34,10 +35,8 @@ export default function ItemModal({
           quantity: 0,
           unit: "COUNT",
           location: "FRIDGE",
-          expirationDate: new Date().toISOString().split("T")[0],
-          purchaseDate: new Date().toISOString().split("T")[0],
-          openedAt: new Date().toISOString().split("T")[0],
-          notes: "",
+          expirationDate: todayISO(),
+          purchaseDate: todayISO(),
         }
       : initialValue;
   const [itemName, setItemName] = useState(defaultValues.name);
@@ -46,9 +45,9 @@ export default function ItemModal({
   const [itemUnit, setItemUnit] = useState(defaultValues.unit);
   const [itemExpDate, setItemExpDate] = useState(defaultValues.expirationDate);
 
-  async function handleSubmit(event: React.SubmitEvent) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const formData = new FormData(event.currentTarget);
     try {
       setIsLoading(true);
       setError(null);
@@ -84,6 +83,7 @@ export default function ItemModal({
       date.setDate(date.getDate() + defaults.expirationDays);
       setItemExpDate(date.toISOString().split("T")[0]);
     }
+
     setSuggestions([]);
   }
 
