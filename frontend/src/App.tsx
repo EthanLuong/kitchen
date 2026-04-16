@@ -21,6 +21,7 @@ import {
   getItemDefaults,
 } from "./api/fetchFood";
 import ItemModal from "./components/ItemModal";
+import QuickAddBar from "./components/QuickAddBar";
 import AuthenticationModal from "./components/AuthCard";
 import FilterBar from "./components/FilterBar";
 import NavBar from "./components/NavBar";
@@ -303,6 +304,11 @@ function App() {
         setLocationFilter={locationFilterHandler}
         setGroupBy={setGroupBy}
       ></FilterBar>
+      <QuickAddBar
+        itemDefaults={itemDefaults}
+        onAddNew={() => setModalState("add")}
+        onQuickAdd={async () => {}}
+      />
       {foodLoading ? (
         <div>Loading...</div>
       ) : (

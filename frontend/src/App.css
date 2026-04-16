@@ -450,3 +450,40 @@ button:hover {
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--sand-lt);
 }
+
+.quickaddbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  background: var(--cream);
+  border-bottom: 1px solid var(--sand-lt);
+}
+
+.quickadd-chip {
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--sand);
+  background: var(--card);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.quickadd-chip:hover {
+  background: var(--tc-pale);
+  border-color: var(--tc-light);
+}
+
+.quickadd-add-new {
+  border-style: dashed;
+  color: var(--mid);
+}
+
+.quickadd-add-new:hover {
+  color: var(--tc);
+}
