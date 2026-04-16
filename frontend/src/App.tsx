@@ -101,12 +101,20 @@ function App() {
       authToken,
       setToken,
     );
+    const expirationDays = Math.max(
+      0,
+      Math.round(
+        (new Date(request.expirationDate).getTime() -
+          new Date(request.purchaseDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      ),
+    );
     const defaults: ItemDefaultsResponse = {
       name: request.name.toUpperCase(),
       foodType: request.foodType.toUpperCase(),
       unit: request.unit.toUpperCase(),
       location: request.location.toUpperCase(),
-      expirationDays: 0,
+      expirationDays,
     };
     setItemDefaults((prev) => [...prev, defaults]);
     setFoodList((prev) => [...prev, response]);
