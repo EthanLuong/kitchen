@@ -10,6 +10,12 @@ import {
 
 const API_URI = import.meta.env.VITE_API_URL;
 
+async function throwIfNotOk(response: Response): Promise<void> {
+  if (response.ok) return;
+  const errorBody = await response.json().catch(() => ({}));
+  throw new Error(errorBody.detail ?? "Something went wrong");
+}
+
 export async function apiFetch(
   url: string,
   options: RequestInit,
@@ -64,10 +70,7 @@ export async function getAllFoodItems(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 
   const data = await response.json();
   return data;
@@ -90,10 +93,7 @@ export async function createNewFoodItem(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
   const data = await response.json();
   return data;
 }
@@ -116,10 +116,7 @@ export async function updateFoodItem(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 
   const data = await response.json();
   return data;
@@ -137,10 +134,7 @@ export async function deleteFoodItem(
     token,
     setToken,
   );
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 }
 
 export async function getTokenLogin(
@@ -154,10 +148,7 @@ export async function getTokenLogin(
     credentials: "include",
   });
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
   const result = await response.json();
   return result.accessToken as Token;
 }
@@ -171,10 +162,7 @@ export async function createNewUser(
     body: JSON.stringify({ username, password }),
   });
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 }
 export async function logoutUser(
   token: Token,
@@ -189,10 +177,7 @@ export async function logoutUser(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 }
 
 export async function getUserLocations(
@@ -208,10 +193,7 @@ export async function getUserLocations(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 
   const data = await response.json();
   return data;
@@ -230,10 +212,7 @@ export async function getUserTypes(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 
   const data = await response.json();
   return data;
@@ -258,10 +237,7 @@ export async function addUserLocations(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 
   const data = await response.json();
   return data;
@@ -286,10 +262,7 @@ export async function addUserTypes(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 
   const data = await response.json();
   return data;
@@ -309,10 +282,7 @@ export async function deleteUserLocations(
     setToken,
   );
 
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 }
 
 export async function deleteUserTypes(
@@ -328,10 +298,7 @@ export async function deleteUserTypes(
     token,
     setToken,
   );
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
 }
 
 export async function getItemDefaults(
@@ -346,10 +313,7 @@ export async function getItemDefaults(
     token,
     setToken,
   );
-  if (!response.ok) {
-    const errorBody = await response.json();
-    throw new Error(errorBody.detail ?? "Something went wrong");
-  }
+  await throwIfNotOk(response);
   const data = await response.json();
   return data;
 }
