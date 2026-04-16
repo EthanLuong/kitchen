@@ -35,7 +35,7 @@ export default function ItemModal({
           quantity: 0,
           unit: "COUNT",
           location: "FRIDGE",
-          expirationDate: todayISO(),
+          expirationDate: "",
           purchaseDate: todayISO(),
         }
       : initialValue;
@@ -87,10 +87,22 @@ export default function ItemModal({
     setSuggestions([]);
   }
 
+  const isEdit = initialValue != null && initialValue != "add";
+
   if (!initialValue) return null;
   return (
     <div className="overlay">
       <div className="modalcard">
+        <button
+          className="modal-close"
+          onClick={() => {
+            setIsOpen(null);
+            setError(null);
+          }}
+        >
+          ✕
+        </button>
+        <h2 className="modal-title">{isEdit ? "Edit item" : "Add item"}</h2>
         <form className="modalform" onSubmit={handleSubmit}>
           <div className="formitem autocomplete-wrapper">
             <label>Name</label>
@@ -100,6 +112,7 @@ export default function ItemModal({
               value={itemName}
               onChange={(e) => handleNameChange(e.target.value)}
               autoComplete="off"
+              placeholder="e.g. Milk"
             />
             {suggestions.length > 0 && (
               <ul className="autocomplete-dropdown">
@@ -111,95 +124,88 @@ export default function ItemModal({
               </ul>
             )}
           </div>
-          <div className="formitem">
-            <label>Quantity</label>
-            <input
-              type="number"
-              defaultValue={defaultValues.quantity}
-              name="quantity"
-              min="0"
-              step="1"
-            ></input>
+          <div className="formrow">
+            <div className="formitem">
+              <label>Quantity</label>
+              <input
+                type="number"
+                defaultValue={defaultValues.quantity}
+                name="quantity"
+                min="0"
+                step="1"
+              />
+            </div>
+            <div className="formitem">
+              <label>Unit</label>
+              <select
+                name="unit"
+                value={itemUnit}
+                onChange={(e) => setItemUnit(e.target.value as Unit)}
+              >
+                {UNIT.map((unit) => (
+                  <option key={unit} value={unit}>
+                    {unit}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="formitem">
-            <label>Unit</label>
-            <select
-              name="unit"
-              value={itemUnit}
-              onChange={(e) => setItemUnit(e.target.value as Unit)}
-            >
-              {UNIT.map((unit) => (
-                <option key={unit} value={unit}>
-                  {unit}
-                </option>
-              ))}
-            </select>
+          <div className="formrow">
+            <div className="formitem">
+              <label>Type</label>
+              <select
+                name="foodType"
+                value={itemType}
+                onChange={(e) => setItemType(e.target.value)}
+              >
+                {userTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="formitem">
+              <label>Location</label>
+              <select
+                name="location"
+                value={itemLocation}
+                onChange={(e) => setItemLocation(e.target.value)}
+              >
+                {userLocations.map((location) => (
+                  <option key={location} value={location}>
+                    {location}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="formitem">
-            <label>Type</label>
-            <select
-              name="foodType"
-              value={itemType}
-              onChange={(e) => setItemType(e.target.value)}
-            >
-              {userTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="formitem">
-            <label>Location</label>
-            <select
-              name="location"
-              value={itemLocation}
-              onChange={(e) => setItemLocation(e.target.value)}
-            >
-              {userLocations.map((location) => (
-                <option key={location} value={location}>
-                  {location}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="formitem">
-            <label>Purchase Date</label>
-            <input
-              type="date"
-              name="purchaseDate"
-              defaultValue={defaultValues.purchaseDate}
-            ></input>
-          </div>
-          <div className="formitem">
-            <label>Expiration</label>
-            <input
-              type="date"
-              name="expirationDate"
-              value={itemExpDate}
-              onChange={(e) => setItemExpDate(e.target.value)}
-            ></input>
+          <hr className="form-divider" />
+          <div className="formrow">
+            <div className="formitem">
+              <label>Purchased</label>
+              <input
+                type="date"
+                name="purchaseDate"
+                defaultValue={defaultValues.purchaseDate}
+              />
+            </div>
+            <div className="formitem">
+              <label>Expires</label>
+              <input
+                type="date"
+                name="expirationDate"
+                value={itemExpDate}
+                onChange={(e) => setItemExpDate(e.target.value)}
+              />
+            </div>
           </div>
 
           <button className="modal-submit" type="submit" disabled={isLoading}>
-            {isLoading
-              ? "Saving..."
-              : initialValue != null && initialValue != "add"
-                ? "Edit Item"
-                : "Add Item"}
+            {isLoading ? "Saving..." : isEdit ? "Save changes" : "Add item"}
           </button>
         </form>
         {itemError && <p className="form-error">{itemError}</p>}
-
-        <button
-          className="modal-close"
-          onClick={() => {
-            setIsOpen(null);
-            setError(null);
-          }}
-        >
-          Exit
-        </button>
       </div>
     </div>
   );

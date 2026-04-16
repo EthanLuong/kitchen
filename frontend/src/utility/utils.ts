@@ -35,14 +35,15 @@ export function responseToFoodItemRequest(item: FoodItemResponse) {
 }
 
 export function formDataToFoodItemRequest(data: FormData) {
+  const expirationDate = data.get("expirationDate") as string;
   const requestItem: FoodItemRequest = {
     name: data.get("name") as string,
     foodType: data.get("foodType") as string,
     quantity: Number(data.get("quantity") as string),
     unit: data.get("unit") as Unit,
     location: data.get("location") as string,
-    expirationDate: data.get("expirationDate") as string,
     purchaseDate: data.get("purchaseDate") as string,
+    ...(expirationDate ? { expirationDate } : {}),
   };
   return requestItem;
 }

@@ -3,6 +3,7 @@ import {
   type UserTypeResponse,
   type UserLocationResponse,
 } from "../types/types";
+import { formatName } from "../utility/utils";
 
 type SettingsModalProps = {
   types: UserTypeResponse[];
@@ -86,16 +87,16 @@ export default function SettingsModal({
         <button className="modal-close" onClick={onClose}>
           ✕
         </button>
-        <h2>Settings</h2>
+        <h2 className="settings-title">Settings</h2>
 
         {error && <p className="form-error">{error}</p>}
 
         <section className="settings-section">
-          <h3>Types</h3>
-          <div className="settings-chips">
+          <p className="settings-label">Food types</p>
+          <div className="settings-items">
             {types.map((type) => (
-              <div key={type.id} className="settings-chip">
-                <span>{type.name}</span>
+              <div key={type.id} className="settings-item">
+                <span>{formatName(type.name)}</span>
                 <button onClick={() => handleDeleteType(type.id, type.name)}>
                   ✕
                 </button>
@@ -107,7 +108,8 @@ export default function SettingsModal({
               type="text"
               value={newType}
               onChange={(e) => setNewType(e.target.value)}
-              placeholder="New type..."
+              onKeyDown={(e) => e.key === "Enter" && handleAddType()}
+              placeholder="Add a type..."
             />
             <button onClick={handleAddType} disabled={isLoading}>
               Add
@@ -115,12 +117,14 @@ export default function SettingsModal({
           </div>
         </section>
 
+        <hr className="settings-divider" />
+
         <section className="settings-section">
-          <h3>Locations</h3>
-          <div className="settings-chips">
+          <p className="settings-label">Storage locations</p>
+          <div className="settings-items">
             {locations.map((location) => (
-              <div key={location.id} className="settings-chip">
-                <span>{location.name}</span>
+              <div key={location.id} className="settings-item">
+                <span>{formatName(location.name)}</span>
                 <button
                   onClick={() =>
                     handleDeleteLocation(location.id, location.name)
@@ -136,7 +140,8 @@ export default function SettingsModal({
               type="text"
               value={newLocation}
               onChange={(e) => setNewLocation(e.target.value)}
-              placeholder="New location..."
+              onKeyDown={(e) => e.key === "Enter" && handleAddLocation()}
+              placeholder="Add a location..."
             />
             <button onClick={handleAddLocation} disabled={isLoading}>
               Add

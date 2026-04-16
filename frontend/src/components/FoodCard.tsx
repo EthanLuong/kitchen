@@ -19,8 +19,8 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
         ✕
       </button>
       <div className="badges">
-        <p>{item.location}</p>
-        <p>{item.foodType}</p>
+        <p>{formatName(item.location)}</p>
+        <p>{formatName(item.foodType)}</p>
         <h1 className="expdate">
           {new Date(item.expirationDate).toLocaleDateString().slice(0, -5)}
         </h1>
