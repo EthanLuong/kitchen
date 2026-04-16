@@ -1,8 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   type FoodItemResponse,
   type FoodItemRequest,
-  type SortOptions,
   type UserLocationResponse,
   type UserTypeResponse,
   type ItemDefaultsResponse,
@@ -28,6 +27,7 @@ import NavBar from "./components/NavBar";
 import {
   responseToFoodItemRequest,
   formDataToFoodItemRequest,
+  toggleInSet,
 } from "./utility/utils";
 
 import "./App.css";
@@ -46,7 +46,6 @@ function App() {
   const [modalState, setModalState] = useState<null | FoodItemResponse | "add">(
     null,
   );
-  const [sortBy, setSortBy] = useState<SortOptions>("name");
   const [isLogin, setIsLogin] = useState(true);
   const [userTypes, setUserTypes] = useState<UserTypeResponse[]>([]);
   const [userLocations, setUserLocations] = useState<UserLocationResponse[]>(
@@ -81,8 +80,6 @@ function App() {
     }
     fetchItems();
   }, [authToken]);
-
-  const authIsOpen = authToken === null;
 
   async function handleDeleteFoodItem(item: FoodItemResponse) {
     try {
@@ -119,11 +116,12 @@ function App() {
   async function handleLogout() {
     if (!authToken) return;
     try {
-      logoutUser(authToken, setToken);
-      setToken(null);
-      localStorage.clear();
+      await logoutUser(authToken, setToken);
     } catch (err) {
       console.log(err);
+    } finally {
+      setToken(null);
+      localStorage.clear();
     }
   }
 
@@ -148,11 +146,7 @@ function App() {
       setTypeFilter(new Set());
       return;
     }
-
-    const filterSet = typeFilter.has(type)
-      ? new Set([...typeFilter].filter((filter) => filter != type))
-      : new Set([...typeFilter, type]);
-    setTypeFilter(filterSet);
+    setTypeFilter((prev) => toggleInSet(prev, type));
   }
   async function handleAddType(name: string) {
     if (!authToken) return;
@@ -166,7 +160,7 @@ function App() {
     const usedTypes = foodList.map((item) => item.foodType);
     if (usedTypes.includes(name.toUpperCase())) {
       throw new Error(
-        `Food items with location ${name} exist. Delete items before deleting location.`,
+        `Food items with type ${name} exist. Delete items before deleting type.`,
       );
     }
     await deleteUserTypes(id, authToken, setToken);
@@ -200,22 +194,7 @@ function App() {
       setLocationFilter(new Set());
       return;
     }
-
-    const filterSet = locationFilter.has(location)
-      ? new Set([...locationFilter].filter((filter) => filter != location))
-      : new Set([...locationFilter, location]);
-    setLocationFilter(filterSet);
-  }
-
-  function sortCards(a: FoodItemResponse, b: FoodItemResponse): number {
-    switch (sortBy) {
-      case "location":
-        return a.location.localeCompare(b.location);
-      case "name":
-        return a.name.localeCompare(b.name);
-      case "type":
-        return a.foodType.localeCompare(b.foodType);
-    }
+    setLocationFilter((prev) => toggleInSet(prev, location));
   }
 
   function closeModals() {
@@ -246,12 +225,18 @@ function App() {
       ? handleAddedItem
       : (data: FormData) => handleEditItem(data, modalState.id);
 
+  const locationNames = useMemo(
+    () => userLocations.map((l) => l.name),
+    [userLocations],
+  );
+  const typeNames = useMemo(() => userTypes.map((t) => t.name), [userTypes]);
+
   const visibleItems = foodList
     .filter(
       (item) => locationFilter.size === 0 || locationFilter.has(item.location),
     )
     .filter((item) => typeFilter.size === 0 || typeFilter.has(item.foodType))
-    .sort(sortCards);
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const grouped = groupItems(visibleItems);
 
@@ -275,15 +260,15 @@ function App() {
       )}
       {modalState && (
         <ItemModal
-          userLocations={userLocations.map((location) => location.name)}
-          userTypes={userTypes.map((type) => type.name)}
+          userLocations={locationNames}
+          userTypes={typeNames}
           initialValue={initialForm}
           itemDefaults={itemDefaults}
           setIsOpen={setModalState}
           onSubmit={modalSubmitHandler}
         ></ItemModal>
       )}
-      {authIsOpen && (
+      {authToken === null && (
         <AuthenticationModal
           mode={isLogin}
           setMode={setIsLogin}
@@ -302,13 +287,12 @@ function App() {
         </div>
       )}
       <FilterBar
-        userLocations={userLocations.map((location) => location.name)}
-        userTypes={userTypes.map((type) => type.name)}
+        userLocations={locationNames}
+        userTypes={typeNames}
         locationFilter={locationFilter}
         typeFilter={typeFilter}
         setTypeFilter={typeFilterHandler}
         setLocationFilter={locationFilterHandler}
-        setSortType={setSortBy}
         setGroupBy={setGroupBy}
       ></FilterBar>
       {foodLoading ? (
