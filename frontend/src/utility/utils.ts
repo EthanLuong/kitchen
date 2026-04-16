@@ -1,5 +1,25 @@
 import type { FoodItemRequest, FoodItemResponse, Unit } from "../types/types";
 
+export function todayISO() {
+  return new Date().toISOString().split("T")[0];
+}
+
+export function toggleInSet<T>(set: Set<T>, value: T): Set<T> {
+  const next = new Set(set);
+  if (next.has(value)) next.delete(value);
+  else next.add(value);
+  return next;
+}
+
+export function formatName(name: string) {
+  return name
+    .toLowerCase()
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ")
+    .trim();
+}
+
 export function responseToFoodItemRequest(item: FoodItemResponse) {
   const requestItem: FoodItemRequest = {
     name: item.name,
@@ -8,9 +28,7 @@ export function responseToFoodItemRequest(item: FoodItemResponse) {
     unit: item.unit,
     location: item.location,
     expirationDate: item.expirationDate,
-    purchaseDate: item.purchaseDate ?? new Date().toISOString().split("T")[0],
-    openedAt: item.openedAt ?? new Date().toISOString().split("T")[0],
-    notes: item.notes ?? "",
+    purchaseDate: item.purchaseDate ?? todayISO(),
   };
 
   return requestItem;
@@ -25,8 +43,6 @@ export function formDataToFoodItemRequest(data: FormData) {
     location: data.get("location") as string,
     expirationDate: data.get("expirationDate") as string,
     purchaseDate: data.get("purchaseDate") as string,
-    openedAt: data.get("openedAt") as string,
-    notes: data.get("notes") as string,
   };
   return requestItem;
 }

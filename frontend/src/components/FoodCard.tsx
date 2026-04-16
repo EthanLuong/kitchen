@@ -1,4 +1,5 @@
 import { type FoodItemResponse } from "../types/types";
+import { formatName } from "../utility/utils";
 type FoodCardProps = {
   item: FoodItemResponse;
   onDelete: (item: FoodItemResponse) => void;
@@ -33,15 +34,4 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
       </div>
     </div>
   );
-}
-
-function formatName(name: string) {
-  const words = name.toLowerCase().split(" ");
-  const formattedName = words.reduce(
-    (acc, curVal) =>
-      acc + (curVal.charAt(0).toUpperCase() + curVal.slice(1) + " "),
-    "",
-  );
-
-  return formattedName.trim();
 }

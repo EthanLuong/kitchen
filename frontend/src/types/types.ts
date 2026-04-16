@@ -34,8 +34,7 @@ export type FoodItemRequest = {
   location: string;
   expirationDate: string;
   purchaseDate: string;
-  openedAt: string;
-  notes: string;
+  notes?: string;
 };
 export type FoodItemResponse = {
   id: number;
@@ -46,7 +45,6 @@ export type FoodItemResponse = {
   location: string;
   expirationDate: string;
   purchaseDate?: string;
-  openedAt?: string;
   notes?: string;
   consumed?: boolean;
   createdAt?: string;
