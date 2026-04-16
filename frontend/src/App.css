@@ -452,30 +452,36 @@ button:hover {
 }
 
 .quickaddbar {
+  width: 80%;
+  margin: 0 auto;
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  overflow-x: auto;
-  background: var(--cream);
-  border-bottom: 1px solid var(--sand-lt);
+  padding: 0.75rem 0;
+  font-family: "Source Sans 3", sans-serif;
 }
 
 .quickadd-chip {
   flex-shrink: 0;
   padding: 0.5rem 1rem;
-  border-radius: 999px;
+  border-radius: 24px;
   border: 1px solid var(--sand);
   background: var(--card);
   color: var(--ink);
-  font-family: inherit;
-  font-size: 0.95rem;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.05rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .quickadd-chip:hover {
-  background: var(--tc-pale);
+  background-color: var(--tc-pale);
   border-color: var(--tc-light);
 }
 
@@ -486,50 +492,78 @@ button:hover {
 
 .quickadd-add-new:hover {
   color: var(--tc);
+  background-color: var(--tc-pale);
+  border-color: var(--tc-light);
 }
 
 .quickadd-chip--expanded {
   flex-shrink: 0;
   padding: 0.5rem 0.75rem;
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--tc-light);
-  background: var(--tc-pale);
+  background-color: var(--card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .quickadd-form {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: inherit;
+  font-family: "Source Sans 3", sans-serif;
 }
 
 .quickadd-form-name {
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.05rem;
+  color: var(--tc);
+}
+
+.quickadd-form input[type="number"],
+.quickadd-form input[type="date"] {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--sand);
+  border-radius: 8px;
+  background-color: var(--cream);
   color: var(--ink);
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 0.85rem;
 }
 
 .quickadd-form input[type="number"] {
-  width: 4rem;
+  width: 3.5rem;
 }
 
 .quickadd-form input[type="date"] {
-  width: 9rem;
+  width: auto;
+}
+
+.quickadd-form input:focus {
+  outline: none;
+  border-color: var(--tc-light);
 }
 
 .quickadd-form button {
   padding: 0.35rem 0.75rem;
-  border-radius: 8px;
+  border-radius: 24px;
   border: 1px solid var(--sand);
-  background: var(--card);
+  background-color: var(--card);
   color: var(--ink);
   cursor: pointer;
-  font-family: inherit;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .quickadd-form button[type="submit"] {
-  background: var(--tc);
-  color: var(--cream);
+  background-color: var(--tc);
+  color: white;
   border-color: var(--tc);
+}
+
+.quickadd-form button[type="submit"]:hover {
+  background-color: var(--tc-light);
+  border-color: var(--tc-light);
 }
 
 .quickadd-form button[disabled] {
