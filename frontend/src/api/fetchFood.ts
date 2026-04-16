@@ -29,10 +29,10 @@ async function refreshAccessToken(
       throw new Error("Session expired. Log in again");
     }
 
-    const { accessToken } = await refreshResponse.json();
+    const { accessToken }: { accessToken: string } = await refreshResponse.json();
     setToken(accessToken);
     localStorage.setItem("token", accessToken);
-    return accessToken as string;
+    return accessToken;
   })().finally(() => {
     refreshInFlight = null;
   });
