@@ -14,6 +14,8 @@ async function throwIfNotOk(response: Response): Promise<void> {
   if (response.ok) return;
   const errorBody = await response.json().catch(() => ({}));
   throw new Error(errorBody.detail ?? "Something went wrong");
+}
+
 let refreshInFlight: Promise<string> | null = null;
 
 async function refreshAccessToken(
