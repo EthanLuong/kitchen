@@ -81,7 +81,7 @@ export default function QuickAddBar({
           <div
             key={d.name}
             className={
-              expanded ? "quickadd-chip quickadd-chip--expanded" : undefined
+              expanded ? "quickadd-chip--expanded" : undefined
             }
           >
             {expanded ? (
