@@ -21,7 +21,7 @@ import {
   getItemDefaults,
 } from "./api/fetchFood";
 import ItemModal from "./components/ItemModal";
-import QuickAddBar from "./components/QuickAddBar";
+import QuickAddBar, { type QuickAddOverrides } from "./components/QuickAddBar";
 import AuthenticationModal from "./components/AuthCard";
 import FilterBar from "./components/FilterBar";
 import NavBar from "./components/NavBar";
@@ -29,6 +29,7 @@ import {
   responseToFoodItemRequest,
   formDataToFoodItemRequest,
   toggleInSet,
+  todayISO,
 } from "./utility/utils";
 
 import "./App.css";
@@ -120,6 +121,24 @@ function App() {
     setItemDefaults((prev) => [...prev, defaults]);
     setFoodList((prev) => [...prev, response]);
     setModalState(null);
+  }
+
+  async function handleQuickAdd(
+    defaults: ItemDefaultsResponse,
+    overrides: QuickAddOverrides,
+  ) {
+    if (!authToken) throw new Error("Not authenticated");
+    const request: FoodItemRequest = {
+      name: defaults.name,
+      foodType: defaults.foodType,
+      unit: defaults.unit as FoodItemRequest["unit"],
+      location: defaults.location,
+      quantity: overrides.quantity,
+      purchaseDate: todayISO(),
+      expirationDate: overrides.expirationDate,
+    };
+    const response = await createNewFoodItem(request, authToken, setToken);
+    setFoodList((prev) => [...prev, response]);
   }
 
   async function handleLogout() {
@@ -307,7 +326,7 @@ function App() {
       <QuickAddBar
         itemDefaults={itemDefaults}
         onAddNew={() => setModalState("add")}
-        onQuickAdd={async () => {}}
+        onQuickAdd={handleQuickAdd}
       />
       {foodLoading ? (
         <div>Loading...</div>

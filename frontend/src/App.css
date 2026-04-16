@@ -487,3 +487,52 @@ button:hover {
 .quickadd-add-new:hover {
   color: var(--tc);
 }
+
+.quickadd-chip--expanded {
+  flex-shrink: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  border: 1px solid var(--tc-light);
+  background: var(--tc-pale);
+}
+
+.quickadd-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+.quickadd-form-name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.quickadd-form input[type="number"] {
+  width: 4rem;
+}
+
+.quickadd-form input[type="date"] {
+  width: 9rem;
+}
+
+.quickadd-form button {
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--sand);
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.quickadd-form button[type="submit"] {
+  background: var(--tc);
+  color: var(--cream);
+  border-color: var(--tc);
+}
+
+.quickadd-form button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
