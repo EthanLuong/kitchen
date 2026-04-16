@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type ItemDefaultsResponse } from "../types/types";
 import { todayISO } from "../utility/utils";
 
@@ -26,6 +26,28 @@ export default function QuickAddBar({
   const [expirationDate, setExpirationDate] = useState<string>(todayISO());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const barRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (expandedName === null) return;
+
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setExpandedName(null);
+    }
+    function handleClick(e: MouseEvent) {
+      if (barRef.current && !barRef.current.contains(e.target as Node)) {
+        setExpandedName(null);
+      }
+    }
+
+    window.addEventListener("keydown", handleKey);
+    window.addEventListener("mousedown", handleClick);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+      window.removeEventListener("mousedown", handleClick);
+    };
+  }, [expandedName]);
+
   const sorted = [...itemDefaults].sort((a, b) => a.name.localeCompare(b.name));
 
   function openChip(d: ItemDefaultsResponse) {
@@ -52,7 +74,7 @@ export default function QuickAddBar({
   }
 
   return (
-    <div className="quickaddbar" role="toolbar" aria-label="Quick add">
+    <div ref={barRef} className="quickaddbar" role="toolbar" aria-label="Quick add">
       {sorted.map((d) => {
         const expanded = expandedName === d.name;
         return (
