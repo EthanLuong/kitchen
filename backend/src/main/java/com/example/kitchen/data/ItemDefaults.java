@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "item_defaults",uniqueConstraints = {@UniqueConstraint(name = "UniqueUserAndItem", columnNames = {"user", "name"})})
+@Table(name = "item_defaults",uniqueConstraints = {@UniqueConstraint(name = "UniqueUserAndItem", columnNames = {"userid", "name"})})
 public class ItemDefaults {
 
     @Id
