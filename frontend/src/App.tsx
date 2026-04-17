@@ -105,14 +105,16 @@ function App() {
       authToken,
       setToken,
     );
-    const expirationDays = Math.max(
-      0,
-      Math.round(
-        (new Date(request.expirationDate).getTime() -
-          new Date(request.purchaseDate).getTime()) /
-          (1000 * 60 * 60 * 24),
-      ),
-    );
+    const expirationDays = request.expirationDate
+      ? Math.max(
+          0,
+          Math.round(
+            (new Date(request.expirationDate).getTime() -
+              new Date(request.purchaseDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
+        )
+      : 0;
     const defaults: ItemDefaultsResponse = {
       name: request.name.toUpperCase(),
       foodType: request.foodType.toUpperCase(),
