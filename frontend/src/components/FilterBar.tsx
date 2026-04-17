@@ -1,3 +1,5 @@
+import { formatName } from "../utility/utils";
+
 type GroupByOptions = "none" | "location" | "type";
 type FilterBarProps = {
   userLocations: string[];
@@ -35,10 +37,12 @@ export default function FilterBar({
                   : undefined
             }
           >
-            {location}
+            {formatName(location)}
           </button>
         ))}
-        <button onClick={() => setLocationFilter(null)}>Clear</button>
+        {locationFilter.size > 0 && (
+          <button className="filter-clear" onClick={() => setLocationFilter(null)}>Clear</button>
+        )}
       </div>
       <div className="filterrow">
         <span>Type</span>
@@ -54,21 +58,24 @@ export default function FilterBar({
                   : undefined
             }
           >
-            {type}
+            {formatName(type)}
           </button>
         ))}
 
-        <button onClick={() => setTypeFilter(null)}>Clear</button>
+        {typeFilter.size > 0 && (
+          <button className="filter-clear" onClick={() => setTypeFilter(null)}>Clear</button>
+        )}
       </div>
 
       <div className="filterrow">
+        <span>Group</span>
         <select
           name="groupby"
           onChange={(e) => setGroupBy(e.target.value as GroupByOptions)}
         >
-          <option value="none">none</option>
-          <option value="location">location</option>
-          <option value="type">type</option>
+          <option value="none">None</option>
+          <option value="location">Location</option>
+          <option value="type">Type</option>
         </select>
       </div>
     </div>

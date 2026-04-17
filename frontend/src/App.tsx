@@ -35,6 +35,8 @@ import {
 import "./App.css";
 import SettingsModal from "./components/SettingsModal";
 import FoodSection from "./components/FoodSection";
+import EmptyState from "./components/EmptyState";
+import SkeletonGrid from "./components/FoodCardSkeleton";
 
 function App() {
   const [foodList, setFoodList] = useState<FoodItemResponse[]>([]);
@@ -329,11 +331,25 @@ function App() {
         onQuickAdd={handleQuickAdd}
       />
       {foodLoading ? (
-        <div>Loading...</div>
+        <SkeletonGrid />
+      ) : foodList.length === 0 ? (
+        <EmptyState
+          variant="no-items"
+          onAddItem={() => setModalState("add")}
+        />
+      ) : visibleItems.length === 0 ? (
+        <EmptyState
+          variant="no-matches"
+          onClearFilters={() => {
+            setLocationFilter(new Set());
+            setTypeFilter(new Set());
+          }}
+        />
       ) : (
         [...grouped.entries()].map(([category, foodList]) =>
           foodList.length > 0 ? (
             <FoodSection
+              key={category}
               title={category}
               showTitle={groupBy !== "none"}
               foodList={foodList}
