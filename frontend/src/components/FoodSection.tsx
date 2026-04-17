@@ -1,4 +1,5 @@
 import type { FoodItemResponse } from "../types/types";
+import { formatName } from "../utility/utils";
 import FoodList from "./FoodList";
 
 type FoodSectionProps = {
@@ -16,9 +17,16 @@ export default function FoodSection({
   onEdit,
 }: FoodSectionProps) {
   return (
-    <div className="food-section">
-      {showTitle && <h2 className="group-header">{title}</h2>}
+    <section className="food-section">
+      {showTitle && (
+        <header className="food-section-header">
+          <h2 className="group-header">{formatName(title)}</h2>
+          <span className="group-count" aria-label={`${foodList.length} items`}>
+            {foodList.length}
+          </span>
+        </header>
+      )}
       <FoodList foodList={foodList} onDelete={onDelete} onEdit={onEdit} />
-    </div>
+    </section>
   );
 }
