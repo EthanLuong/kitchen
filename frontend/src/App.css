@@ -149,16 +149,6 @@ button:hover {
   text-transform: none;
 }
 
-.cardfooter {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--sand-lt);
-  margin-top: auto;
-}
-
 .iteminfo {
   width: 100%;
   display: flex;
