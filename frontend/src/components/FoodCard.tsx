@@ -43,23 +43,14 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
       <div className="badges">
         <p>{formatName(item.location)}</p>
         <p>{formatName(item.foodType)}</p>
-      </div>
-      <div className="iteminfo">
-        <h3 className="itemName">{formatName(item.name)}</h3>
-        <p className="quantity">
-          <span className="number">{item.quantity}</span>
-          <span className="unit">{" " + item.unit.toLowerCase()}</span>
-        </p>
-      </div>
-      <footer className="foodcard-meta">
         <span
           className={`expiry-tag expiry-tag--${expiration.status}`}
           aria-label={`Expiration: ${expiration.label}`}
         >
           <svg
             className="expiry-icon"
-            width="12"
-            height="12"
+            width="11"
+            height="11"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -89,7 +80,14 @@ export default function FoodCard({ item, onDelete, onEdit }: FoodCardProps) {
           {expiration.label}
         </span>
         {isConsumed && <span className="consumed-tag">Consumed</span>}
-      </footer>
+      </div>
+      <div className="iteminfo">
+        <h3 className="itemName">{formatName(item.name)}</h3>
+        <p className="quantity">
+          <span className="number">{item.quantity}</span>
+          <span className="unit">{" " + item.unit.toLowerCase()}</span>
+        </p>
+      </div>
     </article>
   );
 }
