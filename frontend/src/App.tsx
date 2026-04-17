@@ -21,6 +21,7 @@ import {
   getItemDefaults,
 } from "./api/fetchFood";
 import ItemModal from "./components/ItemModal";
+import QuickAddBar, { type QuickAddOverrides } from "./components/QuickAddBar";
 import AuthenticationModal from "./components/AuthCard";
 import FilterBar from "./components/FilterBar";
 import NavBar from "./components/NavBar";
@@ -28,6 +29,7 @@ import {
   responseToFoodItemRequest,
   formDataToFoodItemRequest,
   toggleInSet,
+  todayISO,
 } from "./utility/utils";
 
 import "./App.css";
@@ -103,16 +105,44 @@ function App() {
       authToken,
       setToken,
     );
+    const expirationDays = request.expirationDate
+      ? Math.max(
+          0,
+          Math.round(
+            (new Date(request.expirationDate).getTime() -
+              new Date(request.purchaseDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
+        )
+      : 0;
     const defaults: ItemDefaultsResponse = {
       name: request.name.toUpperCase(),
       foodType: request.foodType.toUpperCase(),
       unit: request.unit.toUpperCase(),
       location: request.location.toUpperCase(),
-      expirationDays: 0,
+      expirationDays,
     };
     setItemDefaults((prev) => [...prev, defaults]);
     setFoodList((prev) => [...prev, response]);
     setModalState(null);
+  }
+
+  async function handleQuickAdd(
+    defaults: ItemDefaultsResponse,
+    overrides: QuickAddOverrides,
+  ) {
+    if (!authToken) throw new Error("Not authenticated");
+    const request: FoodItemRequest = {
+      name: defaults.name,
+      foodType: defaults.foodType,
+      unit: defaults.unit as FoodItemRequest["unit"],
+      location: defaults.location,
+      quantity: overrides.quantity,
+      purchaseDate: todayISO(),
+      expirationDate: overrides.expirationDate,
+    };
+    const response = await createNewFoodItem(request, authToken, setToken);
+    setFoodList((prev) => [...prev, response]);
   }
 
   async function handleLogout() {
@@ -297,6 +327,11 @@ function App() {
         setLocationFilter={locationFilterHandler}
         setGroupBy={setGroupBy}
       ></FilterBar>
+      <QuickAddBar
+        itemDefaults={itemDefaults}
+        onAddNew={() => setModalState("add")}
+        onQuickAdd={handleQuickAdd}
+      />
       {foodLoading ? (
         <SkeletonGrid />
       ) : foodList.length === 0 ? (
