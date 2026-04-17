@@ -18,6 +18,13 @@
 
   --sand: #c8b49a; /* borders — inputs, buttons, dividers */
   --sand-lt: #dacdb3; /* subtle borders — card edges, divider lines */
+
+  --danger: #a23a28; /* muted clay-red — expired items */
+  --danger-pale: #f2d9d2; /* danger tint — expired tag background */
+  --warn: #b87333; /* burnished ochre — urgent (≤2d) */
+  --warn-pale: #f6e4cf; /* warn tint — urgent tag background */
+  --caution: #c49a3a; /* golden wheat — soon (≤7d) */
+  --caution-pale: #f4ead1; /* caution tint — soon tag background */
 }
 *,
 *::before,
@@ -64,30 +71,69 @@ button:hover {
   font-family: "Source Sans 3", sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* replaces justify-content: space-around */
+  gap: 1rem;
   background-color: var(--card);
   text-align: start;
-  padding: 1.5rem;
-  border: 1px solid var(--sand-lt); /* subtle border, sand was too heavy */
+  padding: 1.5rem 1.5rem 1.25rem;
+  border: 1px solid var(--sand-lt);
   border-radius: 16px;
   color: var(--ink);
   position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.foodcard-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: transparent;
+  transition: background-color 0.18s ease;
 }
 
 .foodcard:hover {
-  border-color: var(--sand); /* border darkens slightly on hover */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-color: var(--sand);
+  box-shadow: 0 6px 18px rgba(44, 24, 16, 0.08);
+  transform: translateY(-2px);
   cursor: pointer;
+}
+
+.foodcard--expired .foodcard-accent {
+  background-color: var(--danger);
+}
+.foodcard--urgent .foodcard-accent {
+  background-color: var(--warn);
+}
+.foodcard--soon .foodcard-accent {
+  background-color: var(--caution);
+}
+
+.foodcard--expired {
+  background-color: color-mix(in srgb, var(--danger-pale) 35%, var(--card));
+}
+
+.foodcard--consumed {
+  opacity: 0.55;
+  filter: saturate(0.7);
+}
+.foodcard--consumed .itemName {
+  text-decoration: line-through;
+  text-decoration-color: var(--mid);
+  text-decoration-thickness: 1px;
 }
 
 .badges {
   display: flex;
   width: 100%;
-  gap: 0.5rem;
-  padding: 0; /* removed, gap handles spacing now */
+  gap: 0.4rem;
   padding-bottom: 0.75rem;
-
-  border-bottom: 1px solid var(--sand-lt); /* visual separator between content and actions */
+  border-bottom: 1px solid var(--sand-lt);
+  flex-wrap: wrap;
 }
 
 .badges p {
@@ -101,50 +147,113 @@ button:hover {
   letter-spacing: 0.03rem;
   text-transform: none;
 }
+
 .cardfooter {
-  width: 100%; /* was 80%, inconsistent with rest of card */
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--sand-lt); /* visual separator between content and actions */
-  margin-top: auto; /* pushes footer to bottom if cards have different heights */
+  border-top: 1px solid var(--sand-lt);
+  margin-top: auto;
 }
 
 .iteminfo {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: baseline; /* aligns name and quantity on text baseline */
+  align-items: baseline;
+  gap: 0.5rem;
 }
 
 .itemName {
-  font-size: 1.5rem; /* 3rem was very large */
-  font-family: "Lora", serif; /* Lora for headings, Source Sans for body */
+  font-size: 1.4rem;
+  font-family: "Lora", serif;
+  font-weight: 500;
   margin: 0;
   word-break: break-word;
+  line-height: 1.2;
 }
 
 .quantity {
-  font-size: 0.9rem;
-  color: var(--mid);
-  margin: 0;
-  white-space: nowrap; /* prevents "500 g" from wrapping */
-}
-
-.number {
-  font-size: 1.5rem;
-  font-weight: bold;
-  font-weight: 500;
-  color: var(--ink);
-}
-
-.expdate {
   font-size: 0.85rem;
   color: var(--mid);
   margin: 0;
+  white-space: nowrap;
   font-family: "Source Sans 3", sans-serif;
-  font-weight: 400;
+}
+
+.number {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+.foodcard-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.25rem;
+}
+
+.expiry-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  background-color: var(--sand-lt);
+  color: var(--mid);
+  white-space: nowrap;
+}
+
+.expiry-icon {
+  flex-shrink: 0;
+}
+
+.expiry-tag--expired {
+  background-color: var(--danger-pale);
+  color: var(--danger);
+}
+.expiry-tag--urgent {
+  background-color: var(--warn-pale);
+  color: var(--warn);
+}
+.expiry-tag--soon {
+  background-color: var(--caution-pale);
+  color: color-mix(in srgb, var(--caution) 80%, var(--ink));
+}
+.expiry-tag--good {
+  background-color: var(--sage-pale);
+  color: var(--sage);
+}
+.expiry-tag--none {
+  background-color: transparent;
+  color: var(--mid);
+  border: 1px dashed var(--sand);
+  padding: 0.25rem 0.6rem;
+}
+
+.consumed-tag {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mid);
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--sand-lt);
+  border-radius: 4px;
 }
 
 .deleteitem {
@@ -154,15 +263,29 @@ button:hover {
   background: none;
   border: none;
   color: var(--mid);
-  font-size: 1rem;
-  padding: 0.25rem;
+  padding: 0.35rem;
   margin: 0;
-  line-height: 1;
+  line-height: 0;
   cursor: pointer;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.foodcard:hover .deleteitem,
+.foodcard:focus-within .deleteitem {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .deleteitem:hover {
-  color: #b94040;
+  color: var(--danger);
+  background-color: var(--danger-pale);
 }
 
 .filterbar {
