@@ -32,7 +32,7 @@ export type FoodItemRequest = {
   quantity: number;
   unit: Unit;
   location: string;
-  expirationDate: string;
+  expirationDate?: string;
   purchaseDate: string;
   notes?: string;
 };
